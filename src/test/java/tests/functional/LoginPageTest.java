@@ -1,4 +1,4 @@
-package tests;
+package tests.functional;
 
 import actions.LoginAction;
 import framework.core.Browser;
@@ -13,6 +13,7 @@ import static framework.core.Constants.*;
 @Severity(SeverityLevel.CRITICAL)
 @Owner("QA")
 @Tag("functional")
+
 
 public class LoginPageTest {
 

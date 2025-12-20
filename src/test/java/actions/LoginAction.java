@@ -1,13 +1,13 @@
 package actions;
 
 import framework.core.Browser;
+import framework.core.PropertyReader;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.LoginPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class LoginAction {
     private final LoginPage loginPage;
@@ -43,16 +43,87 @@ public class LoginAction {
         WebElement errorPopup = loginPage.getErrorPopup();
 
         assertThat(errorPopup.isDisplayed(), is(true));
-        assertThat(expectedErrorMessage, equalTo(errorPopup.getText()));
+        assertThat(errorPopup.getText(), equalTo(expectedErrorMessage));
 
         return this;
     }
 
 
-    public void validateCurrentPage(String expectedUrl){
+    public void validateCurrentPage(String expectedUrl) {
         String actualUrl = driver.getCurrentUrl();
 
-        assertThat(expectedUrl, equalTo(actualUrl));
+        assertThat(actualUrl, equalTo(expectedUrl));
     }
 
+
+    public LoginAction verifyTitleText() {
+        String expectedTitleText = PropertyReader.getValue("loginPage", "titleText");
+        String actualTitleText = loginPage.getTitleElement().getText();
+
+        assertThat(actualTitleText, equalTo(expectedTitleText));
+
+        String expectedFontSize = PropertyReader.getValue("loginPage", "titleTextFontSize");
+        String actualFontSize = loginPage.getTitleElement().getCssValue("font-size");
+
+        assertThat(actualFontSize, equalTo(expectedFontSize));
+
+        String expectedFontFamily1 = PropertyReader.getValue("loginPage", "titleTextFontFamily1");
+        String expectedFontFamily2 = PropertyReader.getValue("loginPage", "titleTextFontFamily2");
+        String actualFontFamily = loginPage.getTitleElement().getCssValue("font-family");
+
+        assertThat(actualFontFamily,
+                allOf(
+                        containsString(expectedFontFamily1),
+                        containsString(expectedFontFamily2))
+        );
+        return this;
+    }
+
+    public LoginAction verifyBackgroundColor() {
+        String expectedBackgroundColor = PropertyReader.getValue("loginPage", "backgroundColor");
+        String actualBackgroundColor = loginPage.getLoginPageContainer().getCssValue("background-color");
+
+        assertThat(actualBackgroundColor, equalTo(expectedBackgroundColor));
+        return this;
+    }
+
+    public LoginAction verifyLoginPanel() {
+        String expectedColor = PropertyReader.getValue("loginPage", "loginPanelColor");
+        String actualColor = loginPage.getLoginPanel().getCssValue("background-color");
+
+        assertThat(actualColor, equalTo(expectedColor));
+
+        String expectedUsernamePlaceholder = PropertyReader.getValue("loginPage", "usernamePlaceholder");
+        String expectedPasswordPlaceholder = PropertyReader.getValue("loginPage", "passwordPlaceholder");
+
+        String actualUsernamePlaceholder = loginPage.getUserNameInput().getAttribute("placeholder");
+        String actualPasswordPlaceholder = loginPage.getPasswordInput().getAttribute("placeholder");
+
+        assertThat(actualUsernamePlaceholder, equalTo(expectedUsernamePlaceholder));
+        assertThat(actualPasswordPlaceholder, equalTo(expectedPasswordPlaceholder));
+
+        return this;
+    }
+
+    public void verifyLoginButton() {
+        String expectedColor = PropertyReader.getValue("loginPage", "loginBtnColor");
+        String actualColor = loginPage.getLoginBtn().getCssValue("background-color");
+
+        assertThat(actualColor, equalTo(expectedColor));
+
+        String expectedBorderRadius = PropertyReader.getValue("loginPage", "loginBtnBorderRadius");
+        String actualBorderRadius = loginPage.getLoginBtn().getCssValue("border-radius");
+
+        assertThat(actualBorderRadius, equalTo(expectedBorderRadius));
+
+        String expectedBtnText = PropertyReader.getValue("loginPage", "loginBtnText");
+        String actualBtnText = loginPage.getLoginBtn().getAttribute("value");
+
+        assertThat(actualBtnText, equalTo(expectedBtnText));
+
+        String expectedBtnTextColor = PropertyReader.getValue("loginPage", "loginBtnTextColor");
+        String actualBtnTextColor = loginPage.getLoginBtn().getCssValue("color");
+
+        assertThat(actualBtnTextColor, equalTo(expectedBtnTextColor));
+    }
 }

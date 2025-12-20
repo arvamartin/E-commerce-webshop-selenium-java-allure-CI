@@ -15,6 +15,12 @@ public class LoginPage extends BasePage {
     private WebElement loginBtn;
     @FindBy(css = "[data-test='error']")
     private WebElement errorPopup;
+    @FindBy(className = "login_logo")
+    private WebElement titleElement;
+    @FindBy(className = "login_container")
+    private WebElement loginPageContainer;
+    @FindBy(className = "login_wrapper-inner")
+    private WebElement loginPanel;
 
 
     public WebElement getUserNameInput() {
@@ -33,5 +39,15 @@ public class LoginPage extends BasePage {
         return wait.until(ExpectedConditions.visibilityOf(errorPopup));
     }
 
+    public WebElement getTitleElement() {
+        return titleElement;
+    }
 
+    public WebElement getLoginPageContainer() {
+        return loginPageContainer;
+    }
+
+    public WebElement getLoginPanel() {
+        return loginPanel;
+    }
 }
