@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ["main", "master"]
   workflow_dispatch:
+  schedule:
+  - cron: '08 0 * * 1'
+  - cron: '08 0 * * 4'
 
 permissions:
   contents: write
