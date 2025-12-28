@@ -6,23 +6,28 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.LoginPage;
 
+import static framework.core.Constants.*;
+import static framework.core.Constants.HOME_PAGE_URL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class LoginAction {
+public class LoginAction extends BaseAction<LoginAction>{
     private final LoginPage loginPage;
-    private final WebDriver driver;
+        private final WebDriver driver;
 
     public LoginAction() {
         loginPage = new LoginPage();
         driver = Browser.getDriver();
     }
 
-
-    public LoginAction navigateTo(String url) {
-        driver.get(url);
-        return this;
+    public void login(){
+        navigateTo(LOGIN_URL.getValue());
+        enterUsername(STANDARD_USER.getValue());
+        enterPassword(STANDARD_PASSWORD.getValue());
+        clickOnLoginBtn();
+        validateCurrentPage(HOME_PAGE_URL.getValue());
     }
+
 
     public LoginAction enterUsername(String username) {
         loginPage.getUserNameInput().sendKeys(username);
@@ -49,11 +54,6 @@ public class LoginAction {
     }
 
 
-    public void validateCurrentPage(String expectedUrl) {
-        String actualUrl = driver.getCurrentUrl();
-
-        assertThat(actualUrl, equalTo(expectedUrl));
-    }
 
 
     public LoginAction verifyTitleText() {
@@ -66,6 +66,11 @@ public class LoginAction {
         String actualFontSize = loginPage.getTitleElement().getCssValue("font-size");
 
         assertThat(actualFontSize, equalTo(expectedFontSize));
+
+        String expectedTextColor = PropertyReader.getValue("loginPage","titleTextColor");
+        String actualTextColor = loginPage.getLoginBtn().getCssValue("color");
+
+        assertThat(actualTextColor, equalTo(expectedTextColor));
 
         String expectedFontFamily1 = PropertyReader.getValue("loginPage", "titleTextFontFamily1");
         String expectedFontFamily2 = PropertyReader.getValue("loginPage", "titleTextFontFamily2");
@@ -126,4 +131,5 @@ public class LoginAction {
 
         assertThat(actualBtnTextColor, equalTo(expectedBtnTextColor));
     }
+
 }

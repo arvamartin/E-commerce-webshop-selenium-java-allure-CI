@@ -14,7 +14,6 @@ import static framework.core.Constants.*;
 @Owner("QA")
 @Tag("functional")
 
-
 public class LoginPageTest {
 
     private LoginAction loginAction;
