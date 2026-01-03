@@ -2,16 +2,12 @@ package actions;
 
 import framework.core.Browser;
 import framework.core.Element;
-import org.openqa.selenium.JavascriptExecutor;
+import framework.core.PropertyReader;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.components.Sidebar;
 
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 public class SidebarAction extends BaseAction<SidebarAction> {
 
@@ -53,13 +49,12 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         return this;
     }
 
-    public SidebarAction sidebarMenuIsNotDisplayed() {
+    public void sidebarMenuIsNotDisplayed() {
         WebElement sidebarPanel = sidebar.getSidebarPanel();
 
         new Element(sidebarPanel)
                 .waitForInvisible()
                 .shouldNotBeVisible();
-        return this;
     }
 
 
@@ -73,17 +68,48 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         return this;
     }
 
-    public SidebarAction clickOnAllItemsBtn(){
+    public SidebarAction clickOnAllItemsBtn() {
         new Element(sidebar.getAllItemsBtn()).waitForClickable().click();
         return this;
     }
 
     public SidebarAction clickOnCloseCross() {
-            WebElement closeBtn = sidebar.getCloseBtn();
-
-            ((JavascriptExecutor) driver)
-                    .executeScript("arguments[0].click();", closeBtn);
-
-            return this;
-        }
+        new Element(sidebar.getCloseBtn()).javascriptExecutorClick(driver);
+        return this;
     }
+
+    public SidebarAction verifyPanelBackgroundColor() {
+        new Element(sidebar.getSidebarPanel()).assertCssValue("background-color", sidebarProp("panelBackgroundColor"));
+        return this;
+    }
+
+    public SidebarAction verifyPanelElements() {
+        new Element(sidebar.getAllItemsBtn()).assertText(sidebarProp("allItemText"));
+        new Element(sidebar.getAboutBtn()).assertText(sidebarProp("aboutText"));
+        new Element(sidebar.getLogoutBtn()).assertText(sidebarProp("logoutText"));
+
+
+        String expectedFontFamily1 = sidebarProp("panelElementsFontFamily1");
+        String expectedFontFamily2 = sidebarProp("panelElementsFontFamily2");
+        String expectedFontFamily3 = sidebarProp("panelElementsFontFamily3");
+        String expectedFontFamily4 = sidebarProp("panelElementsFontFamily4");
+
+        for (WebElement element : sidebar.getSidebarElements()) {
+            try {
+                new Element(element)
+                        .assertCssValueContains("font-family", expectedFontFamily1, expectedFontFamily2, expectedFontFamily3, expectedFontFamily4)
+                        .assertCssValue("color", sidebarProp("panelElementsTextColor"))
+                        .assertCssValue("border-bottom-color",sidebarProp("elementBorderBottomColor"));
+            } catch (TimeoutException e) {
+                throw new AssertionError(
+                        "Sidebar element not visible: " + element.getText(), e
+                );
+            }
+        }
+        return this;
+    }
+
+    private String sidebarProp(String key) {
+        return PropertyReader.getValue("sidebarUi", "sidebar", key);
+    }
+}

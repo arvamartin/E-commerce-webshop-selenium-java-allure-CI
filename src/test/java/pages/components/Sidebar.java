@@ -1,7 +1,6 @@
 package pages.components;
 
 import framework.core.BasePage;
-import framework.core.Element;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;

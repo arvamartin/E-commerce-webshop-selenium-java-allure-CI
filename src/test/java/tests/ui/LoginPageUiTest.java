@@ -19,6 +19,7 @@ public class LoginPageUiTest {
     @BeforeEach
     public void setUp() {
         loginAction = new LoginAction();
+        loginAction.navigateTo(LOGIN_URL.getValue());
     }
 
     @AfterEach
@@ -34,7 +35,7 @@ public class LoginPageUiTest {
             "- background color\n" +
             "- font size and colors\n")
     public void uiVerification() {
-        loginAction.navigateTo(LOGIN_URL.getValue())
+        loginAction
                 .verifyTitleText()
                 .verifyBackgroundColor()
                 .verifyLoginPanel()

@@ -9,11 +9,8 @@ public enum Constants {
 
     // Users
     STANDARD_USER("standard_user"),
-    STANDARD_PASSWORD("secret_sauce"),
+    STANDARD_PASSWORD("secret_sauce");
 
-
-    // Property path
-    UI_PROPERTIES_PATH("loginUi.properties");
 
     private final String value;
 

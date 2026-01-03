@@ -1,5 +1,7 @@
 package framework.core;
 
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -35,6 +37,10 @@ public class Element {
 
     public void click() {
         element.click();
+    }
+
+    public void javascriptExecutorClick(WebDriver driver){
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 
     public void sendKeys(String text) {

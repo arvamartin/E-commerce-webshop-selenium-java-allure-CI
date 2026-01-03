@@ -8,7 +8,6 @@ import pages.LoginPage;
 
 import static framework.core.Constants.*;
 import static framework.core.Constants.HOME_PAGE_URL;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LoginAction extends BaseAction<LoginAction> {
     private final LoginPage loginPage;
@@ -19,7 +18,7 @@ public class LoginAction extends BaseAction<LoginAction> {
         driver = Browser.getDriver();
     }
 
-    public void login() {
+    public void loginAsStandardUser() {
         navigateTo(LOGIN_URL.getValue());
         enterUsername(STANDARD_USER.getValue());
         enterPassword(STANDARD_PASSWORD.getValue());
@@ -58,13 +57,12 @@ public class LoginAction extends BaseAction<LoginAction> {
     }
 
 
-
     public LoginAction verifyTitleText() {
-        String expectedTitleText = PropertyReader.getValue("loginUi","loginPage", "titleText");
-        String expectedFontSize = PropertyReader.getValue("loginUi","loginPage", "titleTextFontSize");
-        String expectedTextColor = PropertyReader.getValue("loginUi","loginPage", "titleTextColor");
-        String expectedFontFamily1 = PropertyReader.getValue("loginUi","loginPage", "titleTextFontFamily1");
-        String expectedFontFamily2 = PropertyReader.getValue("loginUi","loginPage", "titleTextFontFamily2");
+        String expectedTitleText = loginPageProp("titleText");
+        String expectedFontSize = loginPageProp("titleTextFontSize");
+        String expectedTextColor = loginPageProp("titleTextColor");
+        String expectedFontFamily1 = loginPageProp("titleTextFontFamily1");
+        String expectedFontFamily2 = loginPageProp("titleTextFontFamily2");
 
         new Element(loginPage.getTitleElement())
                 .assertText(expectedTitleText)
@@ -76,50 +74,43 @@ public class LoginAction extends BaseAction<LoginAction> {
     }
 
     public LoginAction verifyBackgroundColor() {
-        String expectedBackgroundColor = PropertyReader.getValue("loginUi","loginPage", "backgroundColor");
         new Element(loginPage.getLoginPageContainer())
-                .assertCssValue("background-color", expectedBackgroundColor);
+                .assertCssValue("background-color", loginPageProp("backgroundColor"));
         return this;
     }
 
     public LoginAction verifyLoginPanel() {
-        String expectedColor = PropertyReader.getValue("loginUi","loginPage", "loginPanelColor");
         new Element(loginPage.getLoginPanel())
-                .assertCssValue("background-color", expectedColor)
+                .assertCssValue("background-color", loginPageProp("loginPanelColor"))
                 .shouldBeVisible();
 
-        String expectedUsernamePlaceholder = PropertyReader.getValue("loginUi","loginPage", "usernamePlaceholder");
         new Element(loginPage.getUserNameInput())
-                .assertAttribute("placeholder", expectedUsernamePlaceholder);
+                .assertAttribute("placeholder", loginPageProp("usernamePlaceholder"));
 
-        String expectedPasswordPlaceholder = PropertyReader.getValue("loginUi","loginPage", "passwordPlaceholder");
         new Element(loginPage.getPasswordInput())
-                .assertAttribute("placeholder", expectedPasswordPlaceholder);
+                .assertAttribute("placeholder", loginPageProp("passwordPlaceholder"));
 
         return this;
     }
-
 
     public LoginAction verifyLoginButton() {
-        String expectedColor = PropertyReader.getValue("loginUi","loginPage", "loginBtnColor");
         new Element(loginPage.getLoginBtn())
-                .assertCssValue("background-color", expectedColor)
+                .assertCssValue("background-color", loginPageProp("loginBtnColor"))
                 .shouldBeVisible();
 
-        String expectedBorderRadius = PropertyReader.getValue("loginUi","loginPage", "loginBtnBorderRadius");
         new Element(loginPage.getLoginBtn())
-                .assertCssValue("border-radius", expectedBorderRadius);
+                .assertCssValue("border-radius", loginPageProp("loginBtnBorderRadius"));
 
-        String expectedBtnText = PropertyReader.getValue("loginUi","loginPage", "loginBtnText");
         new Element(loginPage.getLoginBtn())
-                .assertAttribute("value", expectedBtnText);
+                .assertAttribute("value", loginPageProp("loginBtnText"));
 
-        String expectedBtnTextColor = PropertyReader.getValue("loginUi","loginPage", "loginBtnTextColor");
         new Element(loginPage.getLoginBtn())
-                .assertCssValue("color", expectedBtnTextColor);
+                .assertCssValue("color", loginPageProp("loginBtnTextColor"));
 
         return this;
     }
 
-
+    private String loginPageProp(String key) {
+        return PropertyReader.getValue("loginUi", "loginPage", key);
+    }
 }

@@ -2,8 +2,6 @@ package actions;
 
 import framework.core.Browser;
 import org.openqa.selenium.WebDriver;
-
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -22,4 +20,3 @@ public abstract class BaseAction<T extends BaseAction<T>> {
         assertThat(actualUrl, equalTo(expectedUrl));
     }
 }
-

@@ -22,7 +22,7 @@ public class SidebarTest {
         sidebarAction = new SidebarAction();
         LoginAction loginAction = new LoginAction();
 
-        loginAction.login();
+        loginAction.loginAsStandardUser();
     }
 
     @AfterEach

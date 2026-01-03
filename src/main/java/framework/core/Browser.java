@@ -27,7 +27,7 @@ public class Browser {
         prefs.put("profile.password_manager_leak_detection", false);
         options.setExperimentalOption("prefs", prefs);
 
-        options.addArguments("--headless=new");
+//        options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
