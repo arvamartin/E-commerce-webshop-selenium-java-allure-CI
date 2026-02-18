@@ -3,7 +3,6 @@ package pages.components;
 import framework.core.BasePage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
@@ -33,24 +32,22 @@ public class Sidebar extends BasePage {
     }
 
     public WebElement getMenuBtn() {
-        return wait.until(ExpectedConditions.elementToBeClickable(menuBtn));
+        return menuBtn;
     }
 
     public WebElement getAllItemsBtn() {
-        return wait.until(ExpectedConditions.elementToBeClickable(allItemsBtn));
+        return allItemsBtn;
     }
 
     public WebElement getAboutBtn() {
-        return wait.until(ExpectedConditions.elementToBeClickable(aboutBtn));
+        return aboutBtn;
     }
 
     public WebElement getLogoutBtn() {
-        return wait.until(ExpectedConditions.elementToBeClickable(logoutBtn));
+        return logoutBtn;
     }
 
     public WebElement getCloseBtn() {
-        wait.until(ExpectedConditions.visibilityOf(closeBtn));
-        wait.until(ExpectedConditions.elementToBeClickable(closeBtn));
         return closeBtn;
     }
 }

@@ -95,17 +95,11 @@ public class LoginAction extends BaseAction<LoginAction> {
 
     public LoginAction verifyLoginButton() {
         new Element(loginPage.getLoginBtn())
+                .shouldBeVisible()
                 .assertCssValue("background-color", loginPageProp("loginBtnColor"))
-                .shouldBeVisible();
-
-        new Element(loginPage.getLoginBtn())
-                .assertCssValue("border-radius", loginPageProp("loginBtnBorderRadius"));
-
-        new Element(loginPage.getLoginBtn())
+                .assertCssValue("border-radius", loginPageProp("loginBtnBorderRadius"))
+                .assertCssValue("color", loginPageProp("loginBtnTextColor"))
                 .assertAttribute("value", loginPageProp("loginBtnText"));
-
-        new Element(loginPage.getLoginBtn())
-                .assertCssValue("color", loginPageProp("loginBtnTextColor"));
 
         return this;
     }

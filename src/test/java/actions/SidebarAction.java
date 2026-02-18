@@ -74,7 +74,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
     }
 
     public SidebarAction clickOnCloseCross() {
-        new Element(sidebar.getCloseBtn()).javascriptExecutorClick(driver);
+        new Element(sidebar.getCloseBtn()).waitForClickable().javascriptExecutorClick(driver);
         return this;
     }
 
