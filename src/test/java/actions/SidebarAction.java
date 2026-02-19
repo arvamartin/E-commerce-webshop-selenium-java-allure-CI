@@ -3,6 +3,7 @@ package actions;
 import framework.core.Browser;
 import framework.core.Element;
 import framework.core.PropertyReader;
+import io.qameta.allure.Step;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,11 +21,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         driver = Browser.getDriver();
     }
 
-    public SidebarAction navigateTo(String url) {
-        sidebar.navigateTo(url);
-        return this;
-    }
-
+    @Step("Opens Sidebar")
     public SidebarAction openSidebar() {
         new Element(sidebar.getMenuBtn())
                 .waitForClickable().click();
@@ -35,7 +32,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         return this;
     }
 
-
+    @Step("Validated presence of items")
     public SidebarAction validatePresenceOfSidebarItems() {
         for (WebElement element : sidebar.getSidebarElements()) {
             try {
@@ -49,6 +46,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         return this;
     }
 
+    @Step("Verifies Sidebar menu is not displayed")
     public void sidebarMenuIsNotDisplayed() {
         WebElement sidebarPanel = sidebar.getSidebarPanel();
 
@@ -57,37 +55,41 @@ public class SidebarAction extends BaseAction<SidebarAction> {
                 .shouldNotBeVisible();
     }
 
-
+    @Step("Clicks on Logout button")
     public SidebarAction logout() {
         new Element(sidebar.getLogoutBtn()).waitForClickable().click();
         return this;
     }
 
+    @Step("Clicks on About button")
     public SidebarAction clickOnAboutBtn() {
         new Element(sidebar.getAboutBtn()).waitForClickable().click();
         return this;
     }
 
+    @Step("Clicks on all All Items button")
     public SidebarAction clickOnAllItemsBtn() {
         new Element(sidebar.getAllItemsBtn()).waitForClickable().click();
         return this;
     }
 
+    @Step("Clicks on Close cross")
     public SidebarAction clickOnCloseCross() {
         new Element(sidebar.getCloseBtn()).waitForClickable().javascriptExecutorClick(driver);
         return this;
     }
 
+    @Step("Verifies background color")
     public SidebarAction verifyPanelBackgroundColor() {
         new Element(sidebar.getSidebarPanel()).assertCssValue("background-color", sidebarProp("panelBackgroundColor"));
         return this;
     }
 
-    public SidebarAction verifyPanelElements() {
-        new Element(sidebar.getAllItemsBtn()).assertText(sidebarProp("allItemText"));
+    @Step("Verifies panel elements")
+    public void verifyPanelElements() {
+        new Element(sidebar.getAllItemsBtn()).waitForVisible().assertText(sidebarProp("allItemText"));
         new Element(sidebar.getAboutBtn()).assertText(sidebarProp("aboutText"));
         new Element(sidebar.getLogoutBtn()).assertText(sidebarProp("logoutText"));
-
 
         String expectedFontFamily1 = sidebarProp("panelElementsFontFamily1");
         String expectedFontFamily2 = sidebarProp("panelElementsFontFamily2");
@@ -106,7 +108,6 @@ public class SidebarAction extends BaseAction<SidebarAction> {
                 );
             }
         }
-        return this;
     }
 
     private String sidebarProp(String key) {

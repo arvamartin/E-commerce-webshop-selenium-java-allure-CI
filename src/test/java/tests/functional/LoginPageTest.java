@@ -69,5 +69,4 @@ public class LoginPageTest {
                 .isErrorPopupDisplayedWithMessage("Epic sadface: You can only access '/inventory.html' when you are logged in.")
                 .validateCurrentPage(LOGIN_URL.getValue());
     }
-
 }

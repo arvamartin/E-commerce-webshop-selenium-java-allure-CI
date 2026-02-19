@@ -3,6 +3,7 @@ package actions;
 import framework.core.Browser;
 import framework.core.Element;
 import framework.core.PropertyReader;
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import pages.LoginPage;
 
@@ -26,7 +27,7 @@ public class LoginAction extends BaseAction<LoginAction> {
         validateCurrentPage(HOME_PAGE_URL.getValue());
     }
 
-
+    @Step("User enters username")
     public LoginAction enterUsername(String username) {
         new Element(loginPage.getUserNameInput())
                 .waitForVisible()
@@ -34,6 +35,7 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
+    @Step("User enters password")
     public LoginAction enterPassword(String password) {
         new Element(loginPage.getPasswordInput())
                 .waitForVisible()
@@ -48,15 +50,15 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
+    @Step("Error message is displayed")
     public LoginAction isErrorPopupDisplayedWithMessage(String expectedErrorMessage) {
-
         new Element(loginPage.getErrorPopup())
                 .assertHasTextAndIsVisible(expectedErrorMessage);
 
         return this;
     }
 
-
+    @Step("Verifies title text")
     public LoginAction verifyTitleText() {
         String expectedTitleText = loginPageProp("titleText");
         String expectedFontSize = loginPageProp("titleTextFontSize");
@@ -73,12 +75,14 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
+    @Step("Verifies background color")
     public LoginAction verifyBackgroundColor() {
         new Element(loginPage.getLoginPageContainer())
                 .assertCssValue("background-color", loginPageProp("backgroundColor"));
         return this;
     }
 
+    @Step("Verifies login panel")
     public LoginAction verifyLoginPanel() {
         new Element(loginPage.getLoginPanel())
                 .assertCssValue("background-color", loginPageProp("loginPanelColor"))
@@ -93,15 +97,14 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
-    public LoginAction verifyLoginButton() {
+    @Step("Verifies login button")
+    public void verifyLoginButton() {
         new Element(loginPage.getLoginBtn())
                 .shouldBeVisible()
                 .assertCssValue("background-color", loginPageProp("loginBtnColor"))
                 .assertCssValue("border-radius", loginPageProp("loginBtnBorderRadius"))
                 .assertCssValue("color", loginPageProp("loginBtnTextColor"))
                 .assertAttribute("value", loginPageProp("loginBtnText"));
-
-        return this;
     }
 
     private String loginPageProp(String key) {
