@@ -22,7 +22,7 @@ public class PropertyReader {
     }
 
     public static String getValue(String fileName, String section, String key) {
-        loadProperty(fileName + ".properties");
+        loadProperty("UIData/" + fileName + ".properties");
         String prefixedKey = section + "." + key;
 
         String systemProperty = System.getProperty(prefixedKey);

@@ -32,7 +32,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         return this;
     }
 
-    @Step("Validated presence of items")
+    @Step("Validates presence of items")
     public SidebarAction validatePresenceOfSidebarItems() {
         for (WebElement element : sidebar.getSidebarElements()) {
             try {

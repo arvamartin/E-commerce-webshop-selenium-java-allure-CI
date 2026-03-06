@@ -15,9 +15,4 @@ public abstract class BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(3));
         PageFactory.initElements(driver, this);
     }
-
-    public void navigateTo(String url) {
-        driver.get(url);
-    }
-
 }

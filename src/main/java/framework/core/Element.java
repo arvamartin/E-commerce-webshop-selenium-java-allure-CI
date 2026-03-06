@@ -17,7 +17,7 @@ public class Element {
 
     public Element(WebElement webElement) {
         this.element = webElement;
-        wait = new WebDriverWait(Browser.getDriver(), Duration.ofSeconds(2));
+        wait = new WebDriverWait(Browser.getDriver(), Duration.ofSeconds(5));
     }
 
     public Element waitForClickable() {

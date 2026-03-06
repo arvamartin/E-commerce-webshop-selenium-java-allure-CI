@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Browser {
-    private static WebDriver driver;
+    private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
     public static WebDriver getDriver() {
-        if (driver == null) {
+        if (driver.get() == null) {
             initializeDriver();
         }
-        driver.manage().window().maximize();
-        return driver;
+        driver.get().manage().window().maximize();
+        return driver.get();
     }
 
     private static void initializeDriver() {
@@ -33,13 +33,13 @@ public class Browser {
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
 
-        driver = new ChromeDriver(options);
+        driver.set(new ChromeDriver(options));
     }
 
     public static void quitDriver() {
-        if (driver != null) {
-            driver.quit();
-            driver = null;
+        if (driver.get() != null) {
+            driver.get().quit();
+            driver.remove();
         }
     }
 }
