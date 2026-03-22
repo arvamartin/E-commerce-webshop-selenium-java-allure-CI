@@ -3,9 +3,13 @@ package actions;
 import framework.core.Browser;
 import framework.core.Element;
 import framework.core.PropertyReader;
+import framework.utils.LoginPanelElementExpected;
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import pages.LoginPage;
+
+import java.util.List;
 
 import static framework.core.Constants.*;
 import static framework.core.Constants.HOME_PAGE_URL;
@@ -58,22 +62,6 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
-    @Step("Verifies title text")
-    public LoginAction verifyTitleText() {
-        String expectedTitleText = loginPageProp("titleText");
-        String expectedFontSize = loginPageProp("titleTextFontSize");
-        String expectedTextColor = loginPageProp("titleTextColor");
-        String expectedFontFamily1 = loginPageProp("titleTextFontFamily1");
-        String expectedFontFamily2 = loginPageProp("titleTextFontFamily2");
-
-        new Element(loginPage.getTitleElement())
-                .assertText(expectedTitleText)
-                .assertCssValue("font-size", expectedFontSize)
-                .assertCssValue("color", expectedTextColor)
-                .assertCssValueContains("font-family", expectedFontFamily1, expectedFontFamily2);
-
-        return this;
-    }
 
     @Step("Verifies background color")
     public LoginAction verifyBackgroundColor() {
@@ -82,29 +70,57 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
-    @Step("Verifies login panel")
+
+    @Step("Verifies login panel elements")
     public LoginAction verifyLoginPanel() {
-        new Element(loginPage.getLoginPanel())
-                .assertCssValue("background-color", loginPageProp("loginPanelColor"))
-                .shouldBeVisible();
+        for (LoginPanelElementExpected expected : LoginPanelElementExpected.values()) {
+            WebElement webElement = resolveElement(expected);
+            Element element = new Element(webElement).waitForVisible();
 
-        new Element(loginPage.getUserNameInput())
-                .assertAttribute("placeholder", loginPageProp("usernamePlaceholder"));
-
-        new Element(loginPage.getPasswordInput())
-                .assertAttribute("placeholder", loginPageProp("passwordPlaceholder"));
-
+            verifyElementTextOrAttribute(element, webElement, expected);
+            verifyElementCss(element, expected);
+        }
         return this;
     }
 
-    @Step("Verifies login button")
-    public void verifyLoginButton() {
-        new Element(loginPage.getLoginBtn())
-                .shouldBeVisible()
-                .assertCssValue("background-color", loginPageProp("loginBtnColor"))
-                .assertCssValue("border-radius", loginPageProp("loginBtnBorderRadius"))
-                .assertCssValue("color", loginPageProp("loginBtnTextColor"))
-                .assertAttribute("value", loginPageProp("loginBtnText"));
+    private void verifyElementTextOrAttribute(Element element, WebElement webElement, LoginPanelElementExpected expected) {
+        String key = expected.getTextKeyOrPlaceholder();
+        if (key == null) return;
+
+        String tag = webElement.getTagName().toLowerCase();
+        String type = webElement.getAttribute("type") != null ? webElement.getAttribute("type").toLowerCase() : "";
+
+        if (tag.equals("input") && !type.equals("submit")) {
+            element.assertAttribute("placeholder", loginPageProp(key));
+        } else if ((tag.equals("input") && type.equals("submit")) || tag.equals("button")) {
+            element.assertAttribute("value", loginPageProp(key));
+        } else {
+            element.assertText(loginPageProp(key));
+        }
+    }
+
+    private void verifyElementCss(Element element, LoginPanelElementExpected expected) {
+        expected.getCss().forEach((cssKey, cssValue) -> {
+            if (cssValue instanceof List<?>) {
+                List<String> values = ((List<String>) cssValue)
+                        .stream()
+                        .map(this::loginPageProp)
+                        .toList();
+                element.assertCssValueContains(cssKey, values.toArray(new String[0]));
+            } else {
+                element.assertCssValue(cssKey, loginPageProp((String) cssValue));
+            }
+        });
+    }
+
+    public WebElement resolveElement(LoginPanelElementExpected expected) {
+        return switch (expected) {
+            case TITLE -> loginPage.getTitleElement();
+            case LOGIN_PANEL -> loginPage.getLoginPanel();
+            case USERNAME_INPUT -> loginPage.getUserNameInput();
+            case PASSWORD_INPUT -> loginPage.getPasswordInput();
+            case LOGIN_BUTTON -> loginPage.getLoginBtn();
+        };
     }
 
     private String loginPageProp(String key) {

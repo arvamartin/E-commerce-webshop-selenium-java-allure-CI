@@ -36,9 +36,7 @@ public class LoginPageUiTest {
             "- font size and colors\n")
     public void uiVerification() {
         loginAction
-                .verifyTitleText()
                 .verifyBackgroundColor()
-                .verifyLoginPanel()
-                .verifyLoginButton();
+                .verifyLoginPanel();
     }
 }

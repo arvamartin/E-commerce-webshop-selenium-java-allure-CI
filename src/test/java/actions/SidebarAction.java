@@ -3,11 +3,14 @@ package actions;
 import framework.core.Browser;
 import framework.core.Element;
 import framework.core.PropertyReader;
+import framework.utils.SidebarElementExpected;
 import io.qameta.allure.Step;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.components.Sidebar;
+
+import java.util.List;
 
 
 public class SidebarAction extends BaseAction<SidebarAction> {
@@ -87,27 +90,36 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
     @Step("Verifies panel elements")
     public void verifyPanelElements() {
-        new Element(sidebar.getAllItemsBtn()).waitForVisible().assertText(sidebarProp("allItemText"));
-        new Element(sidebar.getAboutBtn()).assertText(sidebarProp("aboutText"));
-        new Element(sidebar.getLogoutBtn()).assertText(sidebarProp("logoutText"));
 
-        String expectedFontFamily1 = sidebarProp("panelElementsFontFamily1");
-        String expectedFontFamily2 = sidebarProp("panelElementsFontFamily2");
-        String expectedFontFamily3 = sidebarProp("panelElementsFontFamily3");
-        String expectedFontFamily4 = sidebarProp("panelElementsFontFamily4");
+        for (SidebarElementExpected expected : SidebarElementExpected.values()) {
 
-        for (WebElement element : sidebar.getSidebarElements()) {
-            try {
-                new Element(element)
-                        .assertCssValueContains("font-family", expectedFontFamily1, expectedFontFamily2, expectedFontFamily3, expectedFontFamily4)
-                        .assertCssValue("color", sidebarProp("panelElementsTextColor"))
-                        .assertCssValue("border-bottom-color",sidebarProp("elementBorderBottomColor"));
-            } catch (TimeoutException e) {
-                throw new AssertionError(
-                        "Sidebar element not visible: " + element.getText(), e
-                );
-            }
+            WebElement webElement = resolveElement(expected);
+            Element element = new Element(webElement).waitForVisible();
+
+            element.assertText(sidebarProp(expected.getTextKey()));
+            expected.getCss().forEach((cssKey, cssValue) -> {
+
+                if (cssValue instanceof List<?>) {
+                    List<String> values = ((List<String>) cssValue)
+                            .stream()
+                            .map(this::sidebarProp)
+                            .toList();
+
+                    element.assertCssValueContains(cssKey, values.toArray(new String[0]));
+
+                } else {
+                    element.assertCssValue(cssKey, sidebarProp((String) cssValue));
+                }
+            });
         }
+    }
+
+    public WebElement resolveElement(SidebarElementExpected expected) {
+        return switch (expected) {
+            case ALL_ITEMS -> sidebar.getAllItemsBtn();
+            case ABOUT -> sidebar.getAboutBtn();
+            case LOGOUT -> sidebar.getLogoutBtn();
+        };
     }
 
     private String sidebarProp(String key) {
