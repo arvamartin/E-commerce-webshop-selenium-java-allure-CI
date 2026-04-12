@@ -31,4 +31,13 @@ public class PropertyReader {
         }
         return properties.getProperty(prefixedKey);
     }
+
+    public static String getConfigValue(String filename, String value) {
+        loadProperty(filename);
+        String property = System.getProperty(value);
+        if (property != null && !property.isEmpty()) {
+            return property;
+        }
+        return properties.getProperty(value);
+    }
 }

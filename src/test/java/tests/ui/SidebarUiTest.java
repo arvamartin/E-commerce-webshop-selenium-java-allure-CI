@@ -5,13 +5,14 @@ import actions.SidebarAction;
 import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
+import tests.BaseTest;
 
 @Epic("UI Verification")
 @Feature("Sidebar")
 @Severity(SeverityLevel.CRITICAL)
 @Owner("QA")
 @Tag("UI")
-public class SidebarUiTest {
+public class SidebarUiTest extends BaseTest {
     private SidebarAction sidebarAction;
 
     @BeforeEach

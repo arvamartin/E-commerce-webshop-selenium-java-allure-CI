@@ -1,9 +1,12 @@
 package tests.ui;
 
 import actions.LoginAction;
+import allure.AllureScreenshotListener;
 import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import tests.BaseTest;
 
 import static framework.core.Constants.LOGIN_URL;
 
@@ -12,7 +15,7 @@ import static framework.core.Constants.LOGIN_URL;
 @Severity(SeverityLevel.CRITICAL)
 @Owner("QA")
 @Tag("UI")
-public class LoginPageUiTest {
+public class LoginPageUiTest extends BaseTest {
 
     private LoginAction loginAction;
 

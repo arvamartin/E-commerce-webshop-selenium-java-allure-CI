@@ -6,6 +6,8 @@ import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import tests.BaseTest;
+
 import static framework.core.Constants.*;
 
 @Epic("Authentication")
@@ -14,7 +16,7 @@ import static framework.core.Constants.*;
 @Owner("QA")
 @Tag("functional")
 
-public class LoginPageTest {
+public class LoginPageTest extends BaseTest {
 
     private LoginAction loginAction;
 

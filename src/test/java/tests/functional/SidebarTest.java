@@ -5,6 +5,7 @@ import actions.SidebarAction;
 import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
+import tests.BaseTest;
 
 import static framework.core.Constants.*;
 
@@ -14,7 +15,7 @@ import static framework.core.Constants.*;
 @Owner("QA")
 @Tag("functional")
 
-public class SidebarTest {
+public class SidebarTest extends BaseTest {
     private SidebarAction sidebarAction;
 
     @BeforeEach

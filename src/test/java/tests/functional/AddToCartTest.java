@@ -6,6 +6,7 @@ import actions.ProductAction;
 import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
+import tests.BaseTest;
 
 @Epic("Shopping")
 @Feature("Add to Cart")
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.*;
 @Owner("QA")
 @Tag("functional")
 
-public class AddToCartTest {
+public class AddToCartTest extends BaseTest {
     private LoginAction loginAction;
     private ProductAction productAction;
     private CartAction cartAction;
