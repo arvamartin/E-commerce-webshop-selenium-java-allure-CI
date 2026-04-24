@@ -21,7 +21,7 @@ public class CartPage extends BasePage {
         return new ArrayList<>(cartItemNames);
     }
 
-    public List<WebElement> getCartItemPrices() {;
+    public List<WebElement> getCartItemPrices() {
         waitForCartItems();
         return new ArrayList<>(cartItemPrices);
     }

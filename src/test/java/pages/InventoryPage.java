@@ -3,15 +3,14 @@ package pages;
 import framework.core.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+
+import java.util.Locale;
 
 public class InventoryPage extends BasePage {
-
-    @FindBy(className = "shopping_cart_link")
-    WebElement shoppingCartBadge;
+    private static final By SHOPPING_CART_BADGE = By.className("shopping_cart_badge");
 
     public WebElement getAddToCartButton(String productName) {
-        String formattedName = productName.toLowerCase().replace(" ", "-");
+        String formattedName = formatProductName(productName);
         return driver.findElement(By.id("add-to-cart-" + formattedName));
     }
 
@@ -29,10 +28,17 @@ public class InventoryPage extends BasePage {
     }
 
     private String formatProductName(String productName) {
-        return productName.toLowerCase().replace(" ", "-");
+        return productName
+                .trim()
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("\\s+", "-");
     }
 
     public WebElement getShoppingCartBadge() {
-        return shoppingCartBadge;
+        return driver.findElement(SHOPPING_CART_BADGE);
+    }
+
+    public boolean isShoppingCartBadgeVisible() {
+        return !driver.findElements(SHOPPING_CART_BADGE).isEmpty();
     }
 }

@@ -1,6 +1,8 @@
 package framework.core;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,12 +14,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class Element {
+    private static final int DEFAULT_TIMEOUT_SECONDS = 5;
     private final WebElement element;
     private final WebDriverWait wait;
 
     public Element(WebElement webElement) {
         this.element = webElement;
-        wait = new WebDriverWait(Browser.getDriver(), Duration.ofSeconds(5));
+        wait = new WebDriverWait(Browser.getDriver(), Duration.ofSeconds(resolveTimeoutSeconds()));
     }
 
     public Element waitForClickable() {
@@ -47,12 +50,18 @@ public class Element {
         element.sendKeys(text);
     }
 
+    public Element clearAndType(String text) {
+        element.clear();
+        element.sendKeys(text);
+        return this;
+    }
+
     public String getText(){
         return element.getText();
     }
 
     public Element assertText(String expectedText){
-        assertThat(element.getText(), equalTo(expectedText));
+        assertThat("Unexpected element text", element.getText(), equalTo(expectedText));
         return this;
     }
 
@@ -88,7 +97,26 @@ public class Element {
     }
 
     public Element shouldNotBeVisible() {
-        assertThat(element.isDisplayed(), is(false));
+        boolean notVisible;
+        try {
+            notVisible = !element.isDisplayed();
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            notVisible = true;
+        }
+
+        assertThat(notVisible, is(true));
         return this;
+    }
+
+    private int resolveTimeoutSeconds() {
+        try {
+            String timeoutValue = PropertyReader.getConfigValue("Config.properties", "timeout");
+            if (timeoutValue == null || timeoutValue.isBlank()) {
+                return DEFAULT_TIMEOUT_SECONDS;
+            }
+            return Integer.parseInt(timeoutValue.trim());
+        } catch (Exception ignored) {
+            return DEFAULT_TIMEOUT_SECONDS;
+        }
     }
 }

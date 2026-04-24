@@ -4,13 +4,14 @@ import framework.core.BasePage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sidebar extends BasePage {
 
     @FindBy(className = "bm-menu")
     private WebElement sidebarPanel;
-    @FindBy(className = "bm-item-list")
+    @FindBy(css = ".bm-item-list .bm-item")
     private List<WebElement> sidebarElements;
     @FindBy(id = "react-burger-menu-btn")
     private WebElement menuBtn;
@@ -24,7 +25,7 @@ public class Sidebar extends BasePage {
     private WebElement closeBtn;
 
     public List<WebElement> getSidebarElements() {
-        return sidebarElements;
+        return new ArrayList<>(sidebarElements);
     }
 
     public WebElement getSidebarPanel() {

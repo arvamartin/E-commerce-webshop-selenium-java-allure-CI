@@ -2,7 +2,6 @@ package tests.ui;
 
 import actions.LoginAction;
 import actions.SidebarAction;
-import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import tests.BaseTest;
@@ -21,11 +20,6 @@ public class SidebarUiTest extends BaseTest {
         LoginAction loginAction = new LoginAction();
 
         loginAction.loginAsStandardUser();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        Browser.quitDriver();
     }
 
     @Test

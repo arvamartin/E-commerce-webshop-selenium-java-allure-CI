@@ -2,7 +2,6 @@ package tests.functional;
 
 import actions.LoginAction;
 import actions.SidebarAction;
-import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import tests.BaseTest;
@@ -24,11 +23,6 @@ public class SidebarTest extends BaseTest {
         LoginAction loginAction = new LoginAction();
 
         loginAction.loginAsStandardUser();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        Browser.quitDriver();
     }
 
     @Test
@@ -72,7 +66,7 @@ public class SidebarTest extends BaseTest {
     public void successfulAllItemsFromSidebar(){
         sidebarAction
                 .openSidebar()
-                .navigateTo("https://www.saucedemo.com/inventory-item.html?id=1")
+                .navigateTo(INVENTORY_ITEM_PAGE_URL.getValue() + "1")
                 .openSidebar()
                 .clickOnAllItemsBtn()
                 .validateCurrentPage(HOME_PAGE_URL.getValue());

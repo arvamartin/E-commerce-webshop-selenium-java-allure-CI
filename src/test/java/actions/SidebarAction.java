@@ -6,22 +6,21 @@ import framework.core.PropertyReader;
 import framework.utils.SidebarElementExpected;
 import io.qameta.allure.Step;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.components.Sidebar;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 public class SidebarAction extends BaseAction<SidebarAction> {
 
-    private Sidebar sidebar;
-    private final WebDriver driver;
+    private final Sidebar sidebar;
 
 
     public SidebarAction() {
-        this.sidebar = new Sidebar();
-        driver = Browser.getDriver();
+        sidebar = new Sidebar();
     }
 
     @Step("Opens Sidebar")
@@ -30,6 +29,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
                 .waitForClickable().click();
 
         new Element(sidebar.getSidebarPanel())
+                .waitForVisible()
                 .shouldBeVisible();
 
         return this;
@@ -37,12 +37,19 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
     @Step("Validates presence of items")
     public SidebarAction validatePresenceOfSidebarItems() {
-        for (WebElement element : sidebar.getSidebarElements()) {
+        List<WebElement> sidebarElements = sidebar.getSidebarElements();
+        assertThat("Sidebar items list is unexpectedly empty", sidebarElements.size(), greaterThanOrEqualTo(3));
+
+        for (WebElement element : sidebarElements) {
             try {
                 new Element(element).waitForVisible();
             } catch (TimeoutException e) {
+                String elementHint = element.getAttribute("id");
+                if (elementHint == null || elementHint.isBlank()) {
+                    elementHint = element.getAttribute("class");
+                }
                 throw new AssertionError(
-                        "Sidebar element not visible: " + element.getText(), e
+                        "Sidebar element not visible: " + elementHint, e
                 );
             }
         }
@@ -78,18 +85,22 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
     @Step("Clicks on Close cross")
     public SidebarAction clickOnCloseCross() {
-        new Element(sidebar.getCloseBtn()).waitForClickable().javascriptExecutorClick(driver);
+        new Element(sidebar.getCloseBtn())
+                .waitForClickable()
+                .javascriptExecutorClick(Browser.getDriver());
         return this;
     }
 
     @Step("Verifies background color")
     public SidebarAction verifyPanelBackgroundColor() {
-        new Element(sidebar.getSidebarPanel()).assertCssValue("background-color", sidebarProp("panelBackgroundColor"));
+        new Element(sidebar.getSidebarPanel())
+                .waitForVisible()
+                .assertCssValue("background-color", sidebarProp("panelBackgroundColor"));
         return this;
     }
 
     @Step("Verifies panel elements")
-    public void verifyPanelElements() {
+    public SidebarAction verifyPanelElements() {
 
         for (SidebarElementExpected expected : SidebarElementExpected.values()) {
 
@@ -100,8 +111,9 @@ public class SidebarAction extends BaseAction<SidebarAction> {
             expected.getCss().forEach((cssKey, cssValue) -> {
 
                 if (cssValue instanceof List<?>) {
-                    List<String> values = ((List<String>) cssValue)
+                    List<String> values = ((List<?>) cssValue)
                             .stream()
+                            .map(String.class::cast)
                             .map(this::sidebarProp)
                             .toList();
 
@@ -112,6 +124,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
                 }
             });
         }
+        return this;
     }
 
     public WebElement resolveElement(SidebarElementExpected expected) {

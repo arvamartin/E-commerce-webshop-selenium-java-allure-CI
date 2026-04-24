@@ -4,12 +4,16 @@ import framework.core.Element;
 import io.qameta.allure.Step;
 import pages.InventoryPage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class ProductAction extends BaseAction<ProductAction>{
-    private InventoryPage inventoryPage;
-    private List<String> addedProductsList;
+    private final InventoryPage inventoryPage;
+    private final Set<String> trackedProducts = new LinkedHashSet<>();
+    private boolean productAddedFromDetailsPage = false;
 
     public ProductAction() {
         this.inventoryPage = new InventoryPage();
@@ -17,31 +21,50 @@ public class ProductAction extends BaseAction<ProductAction>{
 
     @Step("User adds product(s) to the cart")
     public ProductAction addProductsToCart(String... productNames) {
-        this.addedProductsList = new ArrayList<>();
+        if (productNames == null || productNames.length == 0) {
+            throw new IllegalArgumentException("At least one product name is required.");
+        }
+
+        trackedProducts.clear();
+        productAddedFromDetailsPage = false;
 
         for (String productName : productNames) {
-            addedProductsList.add(productName);
-            new Element(inventoryPage.getAddToCartButton(productName)).click();
+            trackedProducts.add(productName);
+            new Element(inventoryPage.getAddToCartButton(productName))
+                    .waitForClickable()
+                    .click();
         }
         return this;
     }
 
     @Step("User adds product to the cart")
     public ProductAction addProductToCart(){
-            new Element(inventoryPage.getAddToCartButton()).click();
+        productAddedFromDetailsPage = true;
+        new Element(inventoryPage.getAddToCartButton())
+                .waitForClickable()
+                .click();
         return this;
     }
 
     @Step("Validates remove button is displayed for added products")
     public ProductAction validateRemoveButtonIsDisplayed() {
-        if (addedProductsList != null) {
-            for (String product : addedProductsList) {
-                new Element(inventoryPage.getRemoveBtnForProduct(product)).assertText("Remove");
+        if (!trackedProducts.isEmpty()) {
+            for (String product : trackedProducts) {
+                new Element(inventoryPage.getRemoveBtnForProduct(product))
+                        .waitForVisible()
+                        .assertText("Remove");
             }
-        }else {
-            new Element(inventoryPage.getRemoveBtn()).assertText("Remove");
+            return this;
         }
-        return this;
+
+        if (productAddedFromDetailsPage) {
+            new Element(inventoryPage.getRemoveBtn())
+                    .waitForVisible()
+                    .assertText("Remove");
+            return this;
+        }
+
+        throw new IllegalStateException("No tracked products to validate. Add product(s) to cart before validation.");
     }
 
     @Step("Validates badge count")
@@ -52,23 +75,33 @@ public class ProductAction extends BaseAction<ProductAction>{
 
     @Step("Removes products from cart")
     public ProductAction removeProductsFromCart(){
-        for (String product : addedProductsList) {
-            new Element(inventoryPage.getRemoveBtnForProduct(product)).click();
+        ensureTrackedProducts("remove products from cart");
+        for (String product : trackedProducts) {
+            new Element(inventoryPage.getRemoveBtnForProduct(product))
+                    .waitForClickable()
+                    .click();
         }
         return this;
     }
 
     @Step("Validates add to cart button is displayed")
     public ProductAction validateAddToCartButtonIsDisplayed(){
-        for (String product : addedProductsList) {
+        ensureTrackedProducts("validate add to cart buttons");
+        for (String product : trackedProducts) {
             new Element(inventoryPage.getAddToCartButton(product))
+                    .waitForVisible()
                     .assertText("Add to cart");
         }
         return this;
     }
 
     public void validateCartBadgeIsNotDisplayed(){
-        new Element(inventoryPage.getShoppingCartBadge()).shouldBeVisible();
+        assertThat(inventoryPage.isShoppingCartBadgeVisible(), is(false));
     }
 
+    private void ensureTrackedProducts(String operation) {
+        if (trackedProducts.isEmpty()) {
+            throw new IllegalStateException("Cannot " + operation + " because no products were tracked.");
+        }
+    }
 }

@@ -34,13 +34,11 @@ jobs:
         run: google-chrome --version
 
       - name: Run Selenium tests
-        run: mvn clean test
-        env:
-          HEADLESS: true
+        run: mvn clean test -Dbrowser=chrome -Dheadless=true
 
       - name: Generate Allure report via Maven plugin
         if: always()
-        run: mvn io.qameta.allure:allure-maven:report -Dallure.results.directory=allure-results
+        run: mvn io.qameta.allure:allure-maven:report -Dallure.results.directory=target/allure-results
 
       - name: Copy Allure report to root folder for Pages
         if: always()

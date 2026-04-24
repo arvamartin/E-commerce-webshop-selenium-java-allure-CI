@@ -1,26 +1,21 @@
 package actions;
 
-import framework.core.Browser;
 import framework.core.Element;
 import framework.core.PropertyReader;
 import framework.utils.LoginPanelElementExpected;
 import io.qameta.allure.Step;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.LoginPage;
 
 import java.util.List;
 
 import static framework.core.Constants.*;
-import static framework.core.Constants.HOME_PAGE_URL;
 
 public class LoginAction extends BaseAction<LoginAction> {
     private final LoginPage loginPage;
-    private final WebDriver driver;
 
     public LoginAction() {
-        loginPage = new LoginPage();
-        driver = Browser.getDriver();
+        this.loginPage = new LoginPage();
     }
 
     public void loginAsStandardUser() {
@@ -35,7 +30,7 @@ public class LoginAction extends BaseAction<LoginAction> {
     public LoginAction enterUsername(String username) {
         new Element(loginPage.getUserNameInput())
                 .waitForVisible()
-                .sendKeys(username);
+                .clearAndType(username);
         return this;
     }
 
@@ -43,13 +38,14 @@ public class LoginAction extends BaseAction<LoginAction> {
     public LoginAction enterPassword(String password) {
         new Element(loginPage.getPasswordInput())
                 .waitForVisible()
-                .sendKeys(password);
+                .clearAndType(password);
         return this;
     }
 
+    @Step("User clicks on login button")
     public LoginAction clickOnLoginBtn() {
         new Element(loginPage.getLoginBtn())
-                .waitForVisible()
+                .waitForClickable()
                 .click();
         return this;
     }
@@ -57,6 +53,7 @@ public class LoginAction extends BaseAction<LoginAction> {
     @Step("Error message is displayed")
     public LoginAction isErrorPopupDisplayedWithMessage(String expectedErrorMessage) {
         new Element(loginPage.getErrorPopup())
+                .waitForVisible()
                 .assertHasTextAndIsVisible(expectedErrorMessage);
 
         return this;
@@ -102,8 +99,8 @@ public class LoginAction extends BaseAction<LoginAction> {
     private void verifyElementCss(Element element, LoginPanelElementExpected expected) {
         expected.getCss().forEach((cssKey, cssValue) -> {
             if (cssValue instanceof List<?>) {
-                List<String> values = ((List<String>) cssValue)
-                        .stream()
+                List<String> values = ((List<?>) cssValue).stream()
+                        .map(String.class::cast)
                         .map(this::loginPageProp)
                         .toList();
                 element.assertCssValueContains(cssKey, values.toArray(new String[0]));

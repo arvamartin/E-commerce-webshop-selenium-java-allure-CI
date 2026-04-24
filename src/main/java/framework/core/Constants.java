@@ -5,6 +5,8 @@ public enum Constants {
     // Url-s
     LOGIN_URL("https://www.saucedemo.com/"),
     HOME_PAGE_URL("https://www.saucedemo.com/inventory.html"),
+    CART_PAGE_URL("https://www.saucedemo.com/cart.html"),
+    INVENTORY_ITEM_PAGE_URL("https://www.saucedemo.com/inventory-item.html?id="),
     ABOUT_PAGE_URL("https://saucelabs.com/"),
 
     // Users

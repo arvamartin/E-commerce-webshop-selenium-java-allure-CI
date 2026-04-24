@@ -1,7 +1,6 @@
 package tests.functional;
 
 import actions.LoginAction;
-import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,11 +24,6 @@ public class LoginPageTest extends BaseTest {
         loginAction = new LoginAction();
     }
 
-    @AfterEach
-    public void tearDown(){
-        Browser.quitDriver();
-    }
-
 
     @Test
     @Story("Successful authentication")
@@ -50,7 +44,7 @@ public class LoginPageTest extends BaseTest {
     @Story("Unsuccessful authentication")
     @DisplayName("Unsuccessful login with invalid credentials")
     @Description("Verify that user is unable to log in using invalid credentials.")
-    public void unSuccessfulLogin(String username, String password, String expectedUrl, String expectedErrorMessage){
+    public void unsuccessfulLogin(String username, String password, String expectedUrl, String expectedErrorMessage){
         loginAction
                 .navigateTo(LOGIN_URL.getValue())
                 .enterUsername(username)
@@ -65,7 +59,7 @@ public class LoginPageTest extends BaseTest {
     @Story("Access control for protected resources")
     @DisplayName("Unsuccessful login without login process")
     @Description("Verify that inventory page cannot be accessed without login process")
-    public void unSuccessfulDirectInventoryAccess(){
+    public void unsuccessfulDirectInventoryAccess(){
         loginAction
                 .navigateTo(HOME_PAGE_URL.getValue())
                 .isErrorPopupDisplayedWithMessage("Epic sadface: You can only access '/inventory.html' when you are logged in.")

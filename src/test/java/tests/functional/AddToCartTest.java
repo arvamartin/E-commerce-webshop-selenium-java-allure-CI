@@ -3,10 +3,11 @@ package tests.functional;
 import actions.CartAction;
 import actions.LoginAction;
 import actions.ProductAction;
-import framework.core.Browser;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import tests.BaseTest;
+
+import static framework.core.Constants.*;
 
 @Epic("Shopping")
 @Feature("Add to Cart")
@@ -27,18 +28,13 @@ public class AddToCartTest extends BaseTest {
         loginAction.loginAsStandardUser();
     }
 
-    @AfterEach
-    public void tearDown() {
-        Browser.quitDriver();
-    }
-
     @Test
     @Story("Add single product to cart")
     @DisplayName("Add single product to cart from products page")
     @Description("Verify that a logged in user can add a single product to the cart and the cart badge is updated accordingly")
     public void addSingleProductToCart() {
-        productAction.
-                addProductsToCart("Sauce Labs Backpack")
+        productAction
+                .addProductsToCart("Sauce Labs Backpack")
                 .validateRemoveButtonIsDisplayed()
                 .validateCartBadgeCount(1);
     }
@@ -60,10 +56,10 @@ public class AddToCartTest extends BaseTest {
     @Description("Verify that user can add a product to the cart from the inventory item details page")
     public void addProductToCartFromProductDetailsPage() {
         productAction
-                .navigateTo("https://www.saucedemo.com/inventory-item.html?id=4")
+                .navigateTo(INVENTORY_ITEM_PAGE_URL.getValue() + "4")
                 .addProductToCart()
                 .validateRemoveButtonIsDisplayed()
-                .navigateTo("https://www.saucedemo.com/inventory-item.html?id=2")
+                .navigateTo(INVENTORY_ITEM_PAGE_URL.getValue() + "2")
                 .addProductToCart()
                 .validateRemoveButtonIsDisplayed()
                 .validateCartBadgeCount(2);
@@ -76,8 +72,8 @@ public class AddToCartTest extends BaseTest {
     @DisplayName("Remove product from cart from products page")
     @Description("Verify that user is able to remove a product from the cart and cart badge is updated")
     public void removeProductFromCart() {
-        productAction.
-                addProductsToCart("Sauce Labs Backpack")
+        productAction
+                .addProductsToCart("Sauce Labs Backpack")
                 .removeProductsFromCart()
                 .validateAddToCartButtonIsDisplayed()
                 .validateCartBadgeIsNotDisplayed();
@@ -90,8 +86,8 @@ public class AddToCartTest extends BaseTest {
     public void cartStateShouldPersistAfterNavigation() {
         productAction
                 .addProductsToCart("Sauce Labs Backpack")
-                .navigateTo("https://www.saucedemo.com/cart.html")
-                .navigateTo("https://www.saucedemo.com/inventory.html")
+                .navigateTo(CART_PAGE_URL.getValue())
+                .navigateTo(HOME_PAGE_URL.getValue())
                 .validateRemoveButtonIsDisplayed()
                 .validateCartBadgeCount(1);
     }
@@ -104,7 +100,7 @@ public class AddToCartTest extends BaseTest {
 
         productAction
                 .addProductsToCart("Sauce Labs Backpack", "Sauce Labs Bike Light")
-                .navigateTo("https://www.saucedemo.com/cart.html");
+                .navigateTo(CART_PAGE_URL.getValue());
         cartAction
                 .validateProductsAndPricesInCart("Sauce Labs Backpack", "$29.99")
                 .validateProductsAndPricesInCart("Sauce Labs Bike Light", "$9.99");
