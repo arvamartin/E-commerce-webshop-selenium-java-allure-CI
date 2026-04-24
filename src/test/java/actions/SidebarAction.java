@@ -3,6 +3,8 @@ package actions;
 import framework.core.Browser;
 import framework.core.Element;
 import framework.core.PropertyReader;
+import framework.utils.CssExpectation;
+import framework.utils.CssMatchType;
 import framework.utils.SidebarElementExpected;
 import io.qameta.allure.Step;
 import org.openqa.selenium.TimeoutException;
@@ -108,21 +110,18 @@ public class SidebarAction extends BaseAction<SidebarAction> {
             Element element = new Element(webElement).waitForVisible();
 
             element.assertText(sidebarProp(expected.getTextKey()));
-            expected.getCss().forEach((cssKey, cssValue) -> {
+            for (CssExpectation cssExpectation : expected.getCssExpectations()) {
+                List<String> values = cssExpectation.expectedValueKeys()
+                        .stream()
+                        .map(this::sidebarProp)
+                        .toList();
 
-                if (cssValue instanceof List<?>) {
-                    List<String> values = ((List<?>) cssValue)
-                            .stream()
-                            .map(String.class::cast)
-                            .map(this::sidebarProp)
-                            .toList();
-
-                    element.assertCssValueContains(cssKey, values.toArray(new String[0]));
-
-                } else {
-                    element.assertCssValue(cssKey, sidebarProp((String) cssValue));
+                if (cssExpectation.matchType() == CssMatchType.CONTAINS_ALL) {
+                    element.assertCssValueContains(cssExpectation.cssProperty(), values.toArray(new String[0]));
+                } else if (cssExpectation.matchType() == CssMatchType.EXACT) {
+                    element.assertCssValue(cssExpectation.cssProperty(), values.get(0));
                 }
-            });
+            }
         }
         return this;
     }

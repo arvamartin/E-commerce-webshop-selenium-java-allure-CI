@@ -1,56 +1,73 @@
 package framework.utils;
 
 import java.util.List;
-import java.util.Map;
 
 public enum LoginPanelElementExpected {
 
     TITLE(
+            TextAssertionType.TEXT,
             "titleText",
-            Map.of(
-                    "font-family", List.of("titleTextFontFamily1", "titleTextFontFamily2"),
-                    "font-size", "titleTextFontSize",
-                    "color", "titleTextColor"
+            List.of(
+                    CssExpectation.contains("font-family", "titleTextFontFamily1", "titleTextFontFamily2"),
+                    CssExpectation.exact("font-size", "titleTextFontSize"),
+                    CssExpectation.exact("color", "titleTextColor")
             )
     ),
 
     LOGIN_PANEL(
-            null,
-            Map.of(
-                    "background-color", "loginPanelColor"
+            List.of(
+                    CssExpectation.exact("background-color", "loginPanelColor")
             )
     ),
 
-    USERNAME_INPUT("usernamePlaceholder"),
+    USERNAME_INPUT(TextAssertionType.PLACEHOLDER, "usernamePlaceholder"),
 
-    PASSWORD_INPUT("passwordPlaceholder"),
+    PASSWORD_INPUT(TextAssertionType.PLACEHOLDER, "passwordPlaceholder"),
 
     LOGIN_BUTTON(
+            TextAssertionType.VALUE,
             "loginBtnText",
-            Map.of(
-                    "background-color", "loginBtnColor",
-                    "border-radius", "loginBtnBorderRadius",
-                    "color", "loginBtnTextColor"
+            List.of(
+                    CssExpectation.exact("background-color", "loginBtnColor"),
+                    CssExpectation.exact("border-radius", "loginBtnBorderRadius"),
+                    CssExpectation.exact("color", "loginBtnTextColor")
             )
     );
 
-    private final String textKeyOrPlaceholder;
-    private final Map<String, Object> css;
+    private final TextAssertionType textAssertionType;
+    private final String textAssertionKey;
+    private final List<CssExpectation> cssExpectations;
 
-    LoginPanelElementExpected(String textKeyOrPlaceholder, Map<String, Object> css) {
-        this.textKeyOrPlaceholder = textKeyOrPlaceholder;
-        this.css = css;
+    LoginPanelElementExpected(TextAssertionType textAssertionType, String textAssertionKey, List<CssExpectation> cssExpectations) {
+        this.textAssertionType = textAssertionType;
+        this.textAssertionKey = textAssertionKey;
+        this.cssExpectations = List.copyOf(cssExpectations);
     }
 
-    LoginPanelElementExpected(String textKeyOrPlaceholder) {
-        this(textKeyOrPlaceholder, Map.of());
+    LoginPanelElementExpected(TextAssertionType textAssertionType, String textAssertionKey) {
+        this(textAssertionType, textAssertionKey, List.of());
     }
 
-    public String getTextKeyOrPlaceholder() {
-        return textKeyOrPlaceholder;
+    LoginPanelElementExpected(List<CssExpectation> cssExpectations) {
+        this(TextAssertionType.NONE, "", cssExpectations);
     }
 
-    public Map<String, Object> getCss() {
-        return css;
+    public TextAssertionType getTextAssertionType() {
+        return textAssertionType;
+    }
+
+    public String getTextAssertionKey() {
+        return textAssertionKey;
+    }
+
+    public List<CssExpectation> getCssExpectations() {
+        return cssExpectations;
+    }
+
+    public enum TextAssertionType {
+        NONE,
+        TEXT,
+        PLACEHOLDER,
+        VALUE
     }
 }

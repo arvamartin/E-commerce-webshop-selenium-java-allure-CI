@@ -2,6 +2,8 @@ package actions;
 
 import framework.core.Element;
 import framework.core.PropertyReader;
+import framework.utils.CssMatchType;
+import framework.utils.CssExpectation;
 import framework.utils.LoginPanelElementExpected;
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebElement;
@@ -71,43 +73,37 @@ public class LoginAction extends BaseAction<LoginAction> {
     @Step("Verifies login panel elements")
     public LoginAction verifyLoginPanel() {
         for (LoginPanelElementExpected expected : LoginPanelElementExpected.values()) {
-            WebElement webElement = resolveElement(expected);
-            Element element = new Element(webElement).waitForVisible();
+            Element element = new Element(resolveElement(expected)).waitForVisible();
 
-            verifyElementTextOrAttribute(element, webElement, expected);
+            verifyElementTextOrAttribute(element, expected);
             verifyElementCss(element, expected);
         }
         return this;
     }
 
-    private void verifyElementTextOrAttribute(Element element, WebElement webElement, LoginPanelElementExpected expected) {
-        String key = expected.getTextKeyOrPlaceholder();
-        if (key == null) return;
-
-        String tag = webElement.getTagName().toLowerCase();
-        String type = webElement.getAttribute("type") != null ? webElement.getAttribute("type").toLowerCase() : "";
-
-        if (tag.equals("input") && !type.equals("submit")) {
-            element.assertAttribute("placeholder", loginPageProp(key));
-        } else if ((tag.equals("input") && type.equals("submit")) || tag.equals("button")) {
-            element.assertAttribute("value", loginPageProp(key));
-        } else {
-            element.assertText(loginPageProp(key));
+    private void verifyElementTextOrAttribute(Element element, LoginPanelElementExpected expected) {
+        switch (expected.getTextAssertionType()) {
+            case NONE -> {
+                return;
+            }
+            case PLACEHOLDER -> element.assertAttribute("placeholder", loginPageProp(expected.getTextAssertionKey()));
+            case VALUE -> element.assertAttribute("value", loginPageProp(expected.getTextAssertionKey()));
+            case TEXT -> element.assertText(loginPageProp(expected.getTextAssertionKey()));
         }
     }
 
     private void verifyElementCss(Element element, LoginPanelElementExpected expected) {
-        expected.getCss().forEach((cssKey, cssValue) -> {
-            if (cssValue instanceof List<?>) {
-                List<String> values = ((List<?>) cssValue).stream()
-                        .map(String.class::cast)
-                        .map(this::loginPageProp)
-                        .toList();
-                element.assertCssValueContains(cssKey, values.toArray(new String[0]));
-            } else {
-                element.assertCssValue(cssKey, loginPageProp((String) cssValue));
+        for (CssExpectation cssExpectation : expected.getCssExpectations()) {
+            List<String> expectedValues = cssExpectation.expectedValueKeys().stream()
+                    .map(this::loginPageProp)
+                    .toList();
+
+            if (cssExpectation.matchType() == CssMatchType.CONTAINS_ALL) {
+                element.assertCssValueContains(cssExpectation.cssProperty(), expectedValues.toArray(new String[0]));
+            } else if (cssExpectation.matchType() == CssMatchType.EXACT) {
+                element.assertCssValue(cssExpectation.cssProperty(), expectedValues.get(0));
             }
-        });
+        }
     }
 
     public WebElement resolveElement(LoginPanelElementExpected expected) {
