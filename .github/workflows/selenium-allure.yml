@@ -38,7 +38,7 @@ jobs:
 
       - name: Generate Allure report via Maven plugin
         if: always()
-        run: mvn io.qameta.allure:allure-maven:report -Dallure.results.directory=target/allure-results
+        run: mvn io.qameta.allure:allure-maven:report -Dallure.results.directory=allure-results
 
       - name: Copy Allure report to root folder for Pages
         if: always()
