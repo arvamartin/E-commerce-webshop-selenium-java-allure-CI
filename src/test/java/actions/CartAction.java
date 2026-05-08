@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 public class CartAction extends BaseAction<CartAction> {
-    private CartPage cartPage;
+    private final CartPage cartPage;
 
     public CartAction() {
         this.cartPage = new CartPage();
@@ -31,6 +31,8 @@ public class CartAction extends BaseAction<CartAction> {
                 .map(WebElement::getText)
                 .toList();
 
+        assertThat("Cart names/prices are misaligned", names.size(), equalTo(prices.size()));
+
         int index = names.indexOf(productName);
 
         assertThat("Product not found in cart: " + productName, index, greaterThanOrEqualTo(0));
@@ -38,4 +40,3 @@ public class CartAction extends BaseAction<CartAction> {
         return this;
     }
 }
-

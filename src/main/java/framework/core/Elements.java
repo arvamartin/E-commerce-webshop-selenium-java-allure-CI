@@ -40,13 +40,4 @@ public class Elements {
         assertThat(elements.size(), equalTo(expectedSize));
         return this;
     }
-
-    public Elements shouldHaveTextsMatching(String... expectedTexts) {
-        List<String> actualTexts = getTexts();
-
-        for (String expected : expectedTexts) {
-            assertThat("Expected text not found: " + expected, actualTexts, hasItem(expected));
-        }
-        return this;
-    }
 }

@@ -29,8 +29,9 @@ public class ProductAction extends BaseAction<ProductAction>{
         productAddedFromDetailsPage = false;
 
         for (String productName : productNames) {
-            trackedProducts.add(productName);
-            new Element(inventoryPage.getAddToCartButton(productName))
+            String normalizedProductName = requireProductName(productName);
+            trackedProducts.add(normalizedProductName);
+            new Element(inventoryPage.getAddToCartButton(normalizedProductName))
                     .waitForClickable()
                     .click();
         }
@@ -69,7 +70,7 @@ public class ProductAction extends BaseAction<ProductAction>{
 
     @Step("Validates badge count")
     public void validateCartBadgeCount(int count){
-        new Element(inventoryPage.getShoppingCartBadge()).waitForVisible()
+        new Element(inventoryPage.getShoppingCartBadge())
                 .assertText(String.valueOf(count));
     }
 
@@ -96,6 +97,7 @@ public class ProductAction extends BaseAction<ProductAction>{
     }
 
     public void validateCartBadgeIsNotDisplayed(){
+        inventoryPage.waitForShoppingCartBadgeToDisappear();
         assertThat(inventoryPage.isShoppingCartBadgeVisible(), is(false));
     }
 
@@ -103,5 +105,12 @@ public class ProductAction extends BaseAction<ProductAction>{
         if (trackedProducts.isEmpty()) {
             throw new IllegalStateException("Cannot " + operation + " because no products were tracked.");
         }
+    }
+
+    private String requireProductName(String productName) {
+        if (productName == null || productName.isBlank()) {
+            throw new IllegalArgumentException("Product name must not be null or blank.");
+        }
+        return productName.trim();
     }
 }

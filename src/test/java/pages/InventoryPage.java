@@ -2,12 +2,23 @@ package pages;
 
 import framework.core.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Locale;
 
 public class InventoryPage extends BasePage {
-    private static final By SHOPPING_CART_BADGE = By.className("shopping_cart_badge");
+    @FindBy(id = "add-to-cart")
+    private WebElement addToCartButton;
+
+    @FindBy(id = "remove")
+    private WebElement removeButton;
+
+    @FindBy(className = "shopping_cart_badge")
+    private WebElement shoppingCartBadge;
 
     public WebElement getAddToCartButton(String productName) {
         String formattedName = formatProductName(productName);
@@ -15,7 +26,7 @@ public class InventoryPage extends BasePage {
     }
 
     public WebElement getAddToCartButton() {
-        return driver.findElement(By.id("add-to-cart"));
+        return addToCartButton;
     }
 
     public WebElement getRemoveBtnForProduct(String productName) {
@@ -24,7 +35,7 @@ public class InventoryPage extends BasePage {
     }
 
     public WebElement getRemoveBtn() {
-        return driver.findElement(By.id("remove"));
+        return removeButton;
     }
 
     private String formatProductName(String productName) {
@@ -35,10 +46,18 @@ public class InventoryPage extends BasePage {
     }
 
     public WebElement getShoppingCartBadge() {
-        return driver.findElement(SHOPPING_CART_BADGE);
+        return wait.until(ExpectedConditions.visibilityOf(shoppingCartBadge));
     }
 
     public boolean isShoppingCartBadgeVisible() {
-        return !driver.findElements(SHOPPING_CART_BADGE).isEmpty();
+        try {
+            return shoppingCartBadge.isDisplayed();
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            return false;
+        }
+    }
+
+    public void waitForShoppingCartBadgeToDisappear() {
+        wait.until(ExpectedConditions.invisibilityOf(shoppingCartBadge));
     }
 }

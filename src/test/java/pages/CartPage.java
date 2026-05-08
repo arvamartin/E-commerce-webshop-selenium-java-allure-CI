@@ -26,8 +26,9 @@ public class CartPage extends BasePage {
         return new ArrayList<>(cartItemPrices);
     }
 
-    public void waitForCartItems(){
-        wait.until(driver -> !cartItemNames.isEmpty());
-        wait.until(driver -> !cartItemPrices.isEmpty());
+    private void waitForCartItems(){
+        wait.until(driver -> !cartItemNames.isEmpty()
+                && !cartItemPrices.isEmpty()
+                && cartItemNames.size() == cartItemPrices.size());
     }
 }
