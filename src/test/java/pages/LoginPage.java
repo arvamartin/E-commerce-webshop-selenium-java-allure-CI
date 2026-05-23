@@ -1,6 +1,8 @@
 package pages;
 
+import framework.core.Element;
 import framework.core.BasePage;
+import framework.utils.LoginPanelElementExpected;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -21,32 +23,61 @@ public class LoginPage extends BasePage {
     @FindBy(className = "login_wrapper-inner")
     private WebElement loginPanel;
 
-
-    public WebElement getUserNameInput() {
-        return userNameInput;
+    public void enterUsername(String username) {
+        new Element(userNameInput)
+                .waitForVisible()
+                .clearAndType(username);
     }
 
-    public WebElement getPasswordInput() {
-        return passwordInput;
+    public void enterPassword(String password) {
+        new Element(passwordInput)
+                .waitForVisible()
+                .clearAndType(password);
     }
 
-    public WebElement getLoginBtn() {
-        return loginBtn;
+    public void clickLoginButton() {
+        new Element(loginBtn)
+                .waitForClickable()
+                .click();
     }
 
-    public WebElement getErrorPopup() {
-        return errorPopup;
+    public String getErrorPopupText() {
+        return new Element(errorPopup)
+                .waitForVisible()
+                .getText();
     }
 
-    public WebElement getTitleElement() {
-        return titleElement;
+    public boolean isErrorPopupDisplayed() {
+        return errorPopup.isDisplayed();
     }
 
-    public WebElement getLoginPageContainer() {
-        return loginPageContainer;
+    public String getLoginPageContainerCssValue(String cssProperty) {
+        return loginPageContainer.getCssValue(cssProperty);
     }
 
-    public WebElement getLoginPanel() {
-        return loginPanel;
+    public WebElement resolveElement(LoginPanelElementExpected expected) {
+        return switch (expected) {
+            case TITLE -> titleElement;
+            case LOGIN_PANEL -> loginPanel;
+            case USERNAME_INPUT -> userNameInput;
+            case PASSWORD_INPUT -> passwordInput;
+            case LOGIN_BUTTON -> loginBtn;
+        };
+    }
+
+    public void waitForVisible(WebElement element) {
+        new Element(element).waitForVisible();
+    }
+
+    public String getText(WebElement element) {
+        return element.getText();
+    }
+
+    public String getAttribute(WebElement element, String attribute) {
+        return element.getAttribute(attribute);
+    }
+
+    public String getCssValue(WebElement element, String cssProperty) {
+        return element.getCssValue(cssProperty);
     }
 }

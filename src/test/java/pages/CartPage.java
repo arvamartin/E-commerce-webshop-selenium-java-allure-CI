@@ -5,7 +5,6 @@ import framework.core.BasePage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CartPage extends BasePage {
@@ -16,14 +15,18 @@ public class CartPage extends BasePage {
     @FindBy(className = "inventory_item_price")
     private List<WebElement> cartItemPrices;
 
-    public List<WebElement> getCartItemNames() {
+    public List<String> getCartItemNameTexts() {
         waitForCartItems();
-        return new ArrayList<>(cartItemNames);
+        return cartItemNames.stream()
+                .map(WebElement::getText)
+                .toList();
     }
 
-    public List<WebElement> getCartItemPrices() {
+    public List<String> getCartItemPriceTexts() {
         waitForCartItems();
-        return new ArrayList<>(cartItemPrices);
+        return cartItemPrices.stream()
+                .map(WebElement::getText)
+                .toList();
     }
 
     private void waitForCartItems(){

@@ -1,6 +1,5 @@
 package actions;
 
-import framework.core.Element;
 import framework.core.PropertyReader;
 import framework.utils.CssMatchType;
 import framework.utils.CssExpectation;
@@ -11,6 +10,9 @@ import pages.LoginPage;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static framework.core.Constants.*;
 
 public class LoginAction extends BaseAction<LoginAction> {
@@ -30,42 +32,34 @@ public class LoginAction extends BaseAction<LoginAction> {
 
     @Step("User enters username")
     public LoginAction enterUsername(String username) {
-        new Element(loginPage.getUserNameInput())
-                .waitForVisible()
-                .clearAndType(username);
+        loginPage.enterUsername(username);
         return this;
     }
 
     @Step("User enters password")
     public LoginAction enterPassword(String password) {
-        new Element(loginPage.getPasswordInput())
-                .waitForVisible()
-                .clearAndType(password);
+        loginPage.enterPassword(password);
         return this;
     }
 
     @Step("User clicks on login button")
     public LoginAction clickOnLoginBtn() {
-        new Element(loginPage.getLoginBtn())
-                .waitForClickable()
-                .click();
+        loginPage.clickLoginButton();
         return this;
     }
 
     @Step("Error message is displayed")
     public LoginAction isErrorPopupDisplayedWithMessage(String expectedErrorMessage) {
-        new Element(loginPage.getErrorPopup())
-                .waitForVisible()
-                .assertHasTextAndIsVisible(expectedErrorMessage);
-
+        String actualErrorMessage = loginPage.getErrorPopupText();
+        assertThat(loginPage.isErrorPopupDisplayed(), is(true));
+        assertThat(actualErrorMessage, equalTo(expectedErrorMessage));
         return this;
     }
 
 
     @Step("Verifies background color")
     public LoginAction verifyBackgroundColor() {
-        new Element(loginPage.getLoginPageContainer())
-                .assertCssValue("background-color", loginPageProp("backgroundColor"));
+        assertThat(loginPage.getLoginPageContainerCssValue("background-color"), equalTo(loginPageProp("backgroundColor")));
         return this;
     }
 
@@ -73,7 +67,8 @@ public class LoginAction extends BaseAction<LoginAction> {
     @Step("Verifies login panel elements")
     public LoginAction verifyLoginPanel() {
         for (LoginPanelElementExpected expected : LoginPanelElementExpected.values()) {
-            Element element = new Element(resolveElement(expected)).waitForVisible();
+            WebElement element = resolveElement(expected);
+            loginPage.waitForVisible(element);
 
             verifyElementTextOrAttribute(element, expected);
             verifyElementCss(element, expected);
@@ -81,39 +76,36 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
-    private void verifyElementTextOrAttribute(Element element, LoginPanelElementExpected expected) {
+    private void verifyElementTextOrAttribute(WebElement element, LoginPanelElementExpected expected) {
         switch (expected.getTextAssertionType()) {
             case NONE -> {
                 return;
             }
-            case PLACEHOLDER -> element.assertAttribute("placeholder", loginPageProp(expected.getTextAssertionKey()));
-            case VALUE -> element.assertAttribute("value", loginPageProp(expected.getTextAssertionKey()));
-            case TEXT -> element.assertText(loginPageProp(expected.getTextAssertionKey()));
+            case PLACEHOLDER -> assertThat(loginPage.getAttribute(element, "placeholder"), equalTo(loginPageProp(expected.getTextAssertionKey())));
+            case VALUE -> assertThat(loginPage.getAttribute(element, "value"), equalTo(loginPageProp(expected.getTextAssertionKey())));
+            case TEXT -> assertThat(loginPage.getText(element), equalTo(loginPageProp(expected.getTextAssertionKey())));
         }
     }
 
-    private void verifyElementCss(Element element, LoginPanelElementExpected expected) {
+    private void verifyElementCss(WebElement element, LoginPanelElementExpected expected) {
         for (CssExpectation cssExpectation : expected.getCssExpectations()) {
             List<String> expectedValues = cssExpectation.expectedValueKeys().stream()
                     .map(this::loginPageProp)
                     .toList();
 
+            String actualValue = loginPage.getCssValue(element, cssExpectation.cssProperty());
             if (cssExpectation.matchType() == CssMatchType.CONTAINS_ALL) {
-                element.assertCssValueContains(cssExpectation.cssProperty(), expectedValues.toArray(new String[0]));
+                for (String expectedValue : expectedValues) {
+                    assertThat(actualValue, org.hamcrest.Matchers.containsString(expectedValue));
+                }
             } else if (cssExpectation.matchType() == CssMatchType.EXACT) {
-                element.assertCssValue(cssExpectation.cssProperty(), expectedValues.get(0));
+                assertThat(actualValue, equalTo(expectedValues.get(0)));
             }
         }
     }
 
     public WebElement resolveElement(LoginPanelElementExpected expected) {
-        return switch (expected) {
-            case TITLE -> loginPage.getTitleElement();
-            case LOGIN_PANEL -> loginPage.getLoginPanel();
-            case USERNAME_INPUT -> loginPage.getUserNameInput();
-            case PASSWORD_INPUT -> loginPage.getPasswordInput();
-            case LOGIN_BUTTON -> loginPage.getLoginBtn();
-        };
+        return loginPage.resolveElement(expected);
     }
 
     private String loginPageProp(String key) {

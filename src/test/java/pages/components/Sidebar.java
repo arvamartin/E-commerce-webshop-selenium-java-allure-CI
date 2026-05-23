@@ -1,6 +1,11 @@
 package pages.components;
 
 import framework.core.BasePage;
+import framework.core.Browser;
+import framework.core.Element;
+import framework.utils.SidebarElementExpected;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -28,27 +33,69 @@ public class Sidebar extends BasePage {
         return new ArrayList<>(sidebarElements);
     }
 
-    public WebElement getSidebarPanel() {
-        return sidebarPanel;
+    public void clickMenuButton() {
+        new Element(menuBtn)
+                .waitForClickable()
+                .click();
     }
 
-    public WebElement getMenuBtn() {
-        return menuBtn;
+    public void waitForPanelVisible() {
+        new Element(sidebarPanel)
+                .waitForVisible();
     }
 
-    public WebElement getAllItemsBtn() {
-        return allItemsBtn;
+    public boolean isPanelDisplayed() {
+        try {
+            return sidebarPanel.isDisplayed();
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            return false;
+        }
     }
 
-    public WebElement getAboutBtn() {
-        return aboutBtn;
+    public void waitForPanelInvisible() {
+        new Element(sidebarPanel)
+                .waitForInvisible();
     }
 
-    public WebElement getLogoutBtn() {
-        return logoutBtn;
+    public void clickLogoutButton() {
+        new Element(logoutBtn).waitForClickable().click();
     }
 
-    public WebElement getCloseBtn() {
-        return closeBtn;
+    public void clickAboutButton() {
+        new Element(aboutBtn).waitForClickable().click();
+    }
+
+    public void clickAllItemsButton() {
+        new Element(allItemsBtn).waitForClickable().click();
+    }
+
+    public void clickCloseButton() {
+        new Element(closeBtn)
+                .waitForClickable()
+                .javascriptExecutorClick(Browser.getDriver());
+    }
+
+    public void waitForVisible(WebElement element) {
+        new Element(element).waitForVisible();
+    }
+
+    public String getText(WebElement element) {
+        return element.getText();
+    }
+
+    public String getCssValue(WebElement element, String cssProperty) {
+        return element.getCssValue(cssProperty);
+    }
+
+    public String getPanelCssValue(String cssProperty) {
+        return sidebarPanel.getCssValue(cssProperty);
+    }
+
+    public WebElement resolveElement(SidebarElementExpected expected) {
+        return switch (expected) {
+            case ALL_ITEMS -> allItemsBtn;
+            case ABOUT -> aboutBtn;
+            case LOGOUT -> logoutBtn;
+        };
     }
 }

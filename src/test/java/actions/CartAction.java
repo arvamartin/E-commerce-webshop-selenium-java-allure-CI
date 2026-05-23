@@ -1,7 +1,6 @@
 package actions;
 
 import io.qameta.allure.Step;
-import org.openqa.selenium.WebElement;
 import pages.CartPage;
 
 import java.util.List;
@@ -21,15 +20,8 @@ public class CartAction extends BaseAction<CartAction> {
     @Step("Validates products and prices are displayed in cart")
     public CartAction validateProductsAndPricesInCart(String productName, String expectedPrice) {
 
-        List<String> names = cartPage.getCartItemNames()
-                .stream()
-                .map(WebElement::getText)
-                .toList();
-
-        List<String> prices = cartPage.getCartItemPrices()
-                .stream()
-                .map(WebElement::getText)
-                .toList();
+        List<String> names = cartPage.getCartItemNameTexts();
+        List<String> prices = cartPage.getCartItemPriceTexts();
 
         assertThat("Cart names/prices are misaligned", names.size(), equalTo(prices.size()));
 

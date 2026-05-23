@@ -1,5 +1,6 @@
 package pages;
 
+import framework.core.Element;
 import framework.core.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -20,22 +21,50 @@ public class InventoryPage extends BasePage {
     @FindBy(className = "shopping_cart_badge")
     private WebElement shoppingCartBadge;
 
-    public WebElement getAddToCartButton(String productName) {
+    private WebElement getAddToCartButton(String productName) {
         String formattedName = formatProductName(productName);
         return driver.findElement(By.id("add-to-cart-" + formattedName));
     }
 
-    public WebElement getAddToCartButton() {
-        return addToCartButton;
+    public void clickAddToCartButton(String productName) {
+        new Element(getAddToCartButton(productName))
+                .waitForClickable()
+                .click();
     }
 
-    public WebElement getRemoveBtnForProduct(String productName) {
+    public void clickAddToCartButton() {
+        new Element(addToCartButton)
+                .waitForClickable()
+                .click();
+    }
+
+    private WebElement getRemoveBtnForProduct(String productName) {
         String formattedName = formatProductName(productName);
         return driver.findElement(By.id("remove-" + formattedName));
     }
 
-    public WebElement getRemoveBtn() {
-        return removeButton;
+    public void clickRemoveButtonForProduct(String productName) {
+        new Element(getRemoveBtnForProduct(productName))
+                .waitForClickable()
+                .click();
+    }
+
+    public String getRemoveButtonTextForProduct(String productName) {
+        return new Element(getRemoveBtnForProduct(productName))
+                .waitForVisible()
+                .getText();
+    }
+
+    public String getRemoveButtonText() {
+        return new Element(removeButton)
+                .waitForVisible()
+                .getText();
+    }
+
+    public String getAddToCartButtonText(String productName) {
+        return new Element(getAddToCartButton(productName))
+                .waitForVisible()
+                .getText();
     }
 
     private String formatProductName(String productName) {
@@ -45,8 +74,12 @@ public class InventoryPage extends BasePage {
                 .replaceAll("\\s+", "-");
     }
 
-    public WebElement getShoppingCartBadge() {
+    private WebElement getShoppingCartBadge() {
         return wait.until(ExpectedConditions.visibilityOf(shoppingCartBadge));
+    }
+
+    public String getShoppingCartBadgeText() {
+        return new Element(getShoppingCartBadge()).getText();
     }
 
     public boolean isShoppingCartBadgeVisible() {

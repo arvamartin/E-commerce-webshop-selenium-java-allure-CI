@@ -1,6 +1,5 @@
 package actions;
 
-import framework.core.Element;
 import io.qameta.allure.Step;
 import pages.InventoryPage;
 
@@ -31,9 +30,7 @@ public class ProductAction extends BaseAction<ProductAction>{
         for (String productName : productNames) {
             String normalizedProductName = requireProductName(productName);
             trackedProducts.add(normalizedProductName);
-            new Element(inventoryPage.getAddToCartButton(normalizedProductName))
-                    .waitForClickable()
-                    .click();
+            inventoryPage.clickAddToCartButton(normalizedProductName);
         }
         return this;
     }
@@ -41,9 +38,7 @@ public class ProductAction extends BaseAction<ProductAction>{
     @Step("User adds product to the cart")
     public ProductAction addProductToCart(){
         productAddedFromDetailsPage = true;
-        new Element(inventoryPage.getAddToCartButton())
-                .waitForClickable()
-                .click();
+        inventoryPage.clickAddToCartButton();
         return this;
     }
 
@@ -51,17 +46,13 @@ public class ProductAction extends BaseAction<ProductAction>{
     public ProductAction validateRemoveButtonIsDisplayed() {
         if (!trackedProducts.isEmpty()) {
             for (String product : trackedProducts) {
-                new Element(inventoryPage.getRemoveBtnForProduct(product))
-                        .waitForVisible()
-                        .assertText("Remove");
+                assertThat("Unexpected element text", inventoryPage.getRemoveButtonTextForProduct(product), is("Remove"));
             }
             return this;
         }
 
         if (productAddedFromDetailsPage) {
-            new Element(inventoryPage.getRemoveBtn())
-                    .waitForVisible()
-                    .assertText("Remove");
+            assertThat("Unexpected element text", inventoryPage.getRemoveButtonText(), is("Remove"));
             return this;
         }
 
@@ -70,17 +61,14 @@ public class ProductAction extends BaseAction<ProductAction>{
 
     @Step("Validates badge count")
     public void validateCartBadgeCount(int count){
-        new Element(inventoryPage.getShoppingCartBadge())
-                .assertText(String.valueOf(count));
+        assertThat("Unexpected element text", inventoryPage.getShoppingCartBadgeText(), is(String.valueOf(count)));
     }
 
     @Step("Removes products from cart")
     public ProductAction removeProductsFromCart(){
         ensureTrackedProducts("remove products from cart");
         for (String product : trackedProducts) {
-            new Element(inventoryPage.getRemoveBtnForProduct(product))
-                    .waitForClickable()
-                    .click();
+            inventoryPage.clickRemoveButtonForProduct(product);
         }
         return this;
     }
@@ -89,9 +77,7 @@ public class ProductAction extends BaseAction<ProductAction>{
     public ProductAction validateAddToCartButtonIsDisplayed(){
         ensureTrackedProducts("validate add to cart buttons");
         for (String product : trackedProducts) {
-            new Element(inventoryPage.getAddToCartButton(product))
-                    .waitForVisible()
-                    .assertText("Add to cart");
+            assertThat("Unexpected element text", inventoryPage.getAddToCartButtonText(product), is("Add to cart"));
         }
         return this;
     }

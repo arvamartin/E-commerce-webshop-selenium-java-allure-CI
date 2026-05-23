@@ -1,7 +1,5 @@
 package actions;
 
-import framework.core.Browser;
-import framework.core.Element;
 import framework.core.PropertyReader;
 import framework.utils.CssExpectation;
 import framework.utils.CssMatchType;
@@ -14,7 +12,10 @@ import pages.components.Sidebar;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
 
 public class SidebarAction extends BaseAction<SidebarAction> {
 
@@ -27,12 +28,9 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
     @Step("Opens Sidebar")
     public SidebarAction openSidebar() {
-        new Element(sidebar.getMenuBtn())
-                .waitForClickable().click();
-
-        new Element(sidebar.getSidebarPanel())
-                .waitForVisible()
-                .shouldBeVisible();
+        sidebar.clickMenuButton();
+        sidebar.waitForPanelVisible();
+        assertThat(sidebar.isPanelDisplayed(), is(true));
 
         return this;
     }
@@ -44,7 +42,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
         for (WebElement element : sidebarElements) {
             try {
-                new Element(element).waitForVisible();
+                sidebar.waitForVisible(element);
             } catch (TimeoutException e) {
                 String elementHint = element.getAttribute("id");
                 if (elementHint == null || elementHint.isBlank()) {
@@ -60,44 +58,38 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
     @Step("Verifies Sidebar menu is not displayed")
     public void sidebarMenuIsNotDisplayed() {
-        WebElement sidebarPanel = sidebar.getSidebarPanel();
-
-        new Element(sidebarPanel)
-                .waitForInvisible()
-                .shouldNotBeVisible();
+        sidebar.waitForPanelInvisible();
+        assertThat(sidebar.isPanelDisplayed(), is(false));
     }
 
     @Step("Clicks on Logout button")
     public SidebarAction logout() {
-        new Element(sidebar.getLogoutBtn()).waitForClickable().click();
+        sidebar.clickLogoutButton();
         return this;
     }
 
     @Step("Clicks on About button")
     public SidebarAction clickOnAboutBtn() {
-        new Element(sidebar.getAboutBtn()).waitForClickable().click();
+        sidebar.clickAboutButton();
         return this;
     }
 
     @Step("Clicks on all All Items button")
     public SidebarAction clickOnAllItemsBtn() {
-        new Element(sidebar.getAllItemsBtn()).waitForClickable().click();
+        sidebar.clickAllItemsButton();
         return this;
     }
 
     @Step("Clicks on Close cross")
     public SidebarAction clickOnCloseCross() {
-        new Element(sidebar.getCloseBtn())
-                .waitForClickable()
-                .javascriptExecutorClick(Browser.getDriver());
+        sidebar.clickCloseButton();
         return this;
     }
 
     @Step("Verifies background color")
     public SidebarAction verifyPanelBackgroundColor() {
-        new Element(sidebar.getSidebarPanel())
-                .waitForVisible()
-                .assertCssValue("background-color", sidebarProp("panelBackgroundColor"));
+        sidebar.waitForPanelVisible();
+        assertThat(sidebar.getPanelCssValue("background-color"), equalTo(sidebarProp("panelBackgroundColor")));
         return this;
     }
 
@@ -107,19 +99,22 @@ public class SidebarAction extends BaseAction<SidebarAction> {
         for (SidebarElementExpected expected : SidebarElementExpected.values()) {
 
             WebElement webElement = resolveElement(expected);
-            Element element = new Element(webElement).waitForVisible();
+            sidebar.waitForVisible(webElement);
 
-            element.assertText(sidebarProp(expected.getTextKey()));
+            assertThat(sidebar.getText(webElement), equalTo(sidebarProp(expected.getTextKey())));
             for (CssExpectation cssExpectation : expected.getCssExpectations()) {
                 List<String> values = cssExpectation.expectedValueKeys()
                         .stream()
                         .map(this::sidebarProp)
                         .toList();
 
+                String actualValue = sidebar.getCssValue(webElement, cssExpectation.cssProperty());
                 if (cssExpectation.matchType() == CssMatchType.CONTAINS_ALL) {
-                    element.assertCssValueContains(cssExpectation.cssProperty(), values.toArray(new String[0]));
+                    for (String value : values) {
+                        assertThat(actualValue, containsString(value));
+                    }
                 } else if (cssExpectation.matchType() == CssMatchType.EXACT) {
-                    element.assertCssValue(cssExpectation.cssProperty(), values.get(0));
+                    assertThat(actualValue, equalTo(values.get(0)));
                 }
             }
         }
@@ -127,11 +122,7 @@ public class SidebarAction extends BaseAction<SidebarAction> {
     }
 
     public WebElement resolveElement(SidebarElementExpected expected) {
-        return switch (expected) {
-            case ALL_ITEMS -> sidebar.getAllItemsBtn();
-            case ABOUT -> sidebar.getAboutBtn();
-            case LOGOUT -> sidebar.getLogoutBtn();
-        };
+        return sidebar.resolveElement(expected);
     }
 
     private String sidebarProp(String key) {
