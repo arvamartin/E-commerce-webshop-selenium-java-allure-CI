@@ -46,10 +46,6 @@ public class Element {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
 
-    public void sendKeys(String text) {
-        element.sendKeys(text);
-    }
-
     public Element clearAndType(String text) {
         element.clear();
         element.sendKeys(text);
@@ -60,52 +56,20 @@ public class Element {
         return element.getText();
     }
 
-    public Element assertText(String expectedText){
-        assertThat("Unexpected element text", element.getText(), equalTo(expectedText));
-        return this;
+    public String getAttribute(String attribute) {
+        return element.getAttribute(attribute);
     }
 
-    public Element assertCssValue(String cssProperty, String expectedValue) {
-        String actualValue = element.getCssValue(cssProperty);
-        assertThat(actualValue, equalTo(expectedValue));
-        return this;
+    public String getCssValue(String cssProperty) {
+        return element.getCssValue(cssProperty);
     }
 
-    public Element assertCssValueContains(String cssProperty, String... expectedParts) {
-        String actualValue = element.getCssValue(cssProperty);
-        for (String part : expectedParts) {
-            assertThat(actualValue, containsString(part));
-        }
-        return this;
-    }
-
-    public Element shouldBeVisible() {
-        assertThat(element.isDisplayed(), is(true));
-        return this;
-    }
-
-    public Element assertAttribute(String attribute, String expectedValue) {
-        String actualValue = element.getAttribute(attribute);
-        assertThat(actualValue, equalTo(expectedValue));
-        return this;
-    }
-
-    public Element assertHasTextAndIsVisible(String expectedText) {
-        assertThat(element.isDisplayed(), is(true));
-        assertThat(element.getText(), equalTo(expectedText)); 
-        return this;
-    }
-
-    public Element shouldNotBeVisible() {
-        boolean notVisible;
+    public boolean isDisplayed() {
         try {
-            notVisible = !element.isDisplayed();
+            return element.isDisplayed();
         } catch (NoSuchElementException | StaleElementReferenceException e) {
-            notVisible = true;
+            return false;
         }
-
-        assertThat(notVisible, is(true));
-        return this;
     }
 
     private int resolveTimeoutSeconds() {

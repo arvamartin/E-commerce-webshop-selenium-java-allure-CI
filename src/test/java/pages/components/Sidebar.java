@@ -88,14 +88,18 @@ public class Sidebar extends BasePage {
     }
 
     public String getPanelCssValue(String cssProperty) {
-        return sidebarPanel.getCssValue(cssProperty);
+        return element(sidebarPanel).getCssValue(cssProperty);
     }
 
-    public WebElement resolveElement(SidebarElementExpected expected) {
+    public Element resolveElement(SidebarElementExpected expected) {
         return switch (expected) {
-            case ALL_ITEMS -> allItemsBtn;
-            case ABOUT -> aboutBtn;
-            case LOGOUT -> logoutBtn;
+            case ALL_ITEMS -> element(allItemsBtn);
+            case ABOUT -> element(aboutBtn);
+            case LOGOUT -> element(logoutBtn);
         };
+    }
+
+    private Element element(WebElement webElement) {
+        return new Element(webElement);
     }
 }

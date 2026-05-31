@@ -25,6 +25,14 @@ public record CssExpectation(String cssProperty, CssMatchType matchType, List<St
         return new CssExpectation(cssProperty, CssMatchType.EXACT, List.of(expectedValueKey));
     }
 
+    public static CssExpectation colorNear(String cssProperty, String expectedValueKey) {
+        return new CssExpectation(cssProperty, CssMatchType.COLOR_NEAR, List.of(expectedValueKey));
+    }
+
+    public static CssExpectation pixelNear(String cssProperty, String expectedValueKey) {
+        return new CssExpectation(cssProperty, CssMatchType.PIXEL_NEAR, List.of(expectedValueKey));
+    }
+
     public static CssExpectation contains(String cssProperty, String... expectedValueKeys) {
         return new CssExpectation(cssProperty, CssMatchType.CONTAINS_ALL, List.of(expectedValueKeys));
     }

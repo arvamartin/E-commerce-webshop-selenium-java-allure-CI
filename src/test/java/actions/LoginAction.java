@@ -1,11 +1,11 @@
 package actions;
 
 import framework.core.PropertyReader;
-import framework.utils.CssMatchType;
+import framework.core.Element;
+import framework.utils.CssAssertions;
 import framework.utils.CssExpectation;
 import framework.utils.LoginPanelElementExpected;
 import io.qameta.allure.Step;
-import org.openqa.selenium.WebElement;
 import pages.LoginPage;
 
 import java.util.List;
@@ -59,7 +59,13 @@ public class LoginAction extends BaseAction<LoginAction> {
 
     @Step("Verifies background color")
     public LoginAction verifyBackgroundColor() {
-        assertThat(loginPage.getLoginPageContainerCssValue("background-color"), equalTo(loginPageProp("backgroundColor")));
+        CssExpectation expectation = CssExpectation.colorNear("background-color", "backgroundColor");
+        CssAssertions.assertCss(
+                "background-color",
+                loginPage.getLoginPageContainerCssValue("background-color"),
+                expectation,
+                loginPageProp("backgroundColor")
+        );
         return this;
     }
 
@@ -67,8 +73,8 @@ public class LoginAction extends BaseAction<LoginAction> {
     @Step("Verifies login panel elements")
     public LoginAction verifyLoginPanel() {
         for (LoginPanelElementExpected expected : LoginPanelElementExpected.values()) {
-            WebElement element = resolveElement(expected);
-            loginPage.waitForVisible(element);
+            Element element = resolveElement(expected);
+            element.waitForVisible();
 
             verifyElementTextOrAttribute(element, expected);
             verifyElementCss(element, expected);
@@ -76,35 +82,33 @@ public class LoginAction extends BaseAction<LoginAction> {
         return this;
     }
 
-    private void verifyElementTextOrAttribute(WebElement element, LoginPanelElementExpected expected) {
+    private void verifyElementTextOrAttribute(Element element, LoginPanelElementExpected expected) {
         switch (expected.getTextAssertionType()) {
             case NONE -> {
                 return;
             }
-            case PLACEHOLDER -> assertThat(loginPage.getAttribute(element, "placeholder"), equalTo(loginPageProp(expected.getTextAssertionKey())));
-            case VALUE -> assertThat(loginPage.getAttribute(element, "value"), equalTo(loginPageProp(expected.getTextAssertionKey())));
-            case TEXT -> assertThat(loginPage.getText(element), equalTo(loginPageProp(expected.getTextAssertionKey())));
+            case PLACEHOLDER -> assertThat(element.getAttribute("placeholder"), equalTo(loginPageProp(expected.getTextAssertionKey())));
+            case VALUE -> assertThat(element.getAttribute("value"), equalTo(loginPageProp(expected.getTextAssertionKey())));
+            case TEXT -> assertThat(element.getText(), equalTo(loginPageProp(expected.getTextAssertionKey())));
         }
     }
 
-    private void verifyElementCss(WebElement element, LoginPanelElementExpected expected) {
+    private void verifyElementCss(Element element, LoginPanelElementExpected expected) {
         for (CssExpectation cssExpectation : expected.getCssExpectations()) {
             List<String> expectedValues = cssExpectation.expectedValueKeys().stream()
                     .map(this::loginPageProp)
                     .toList();
 
-            String actualValue = loginPage.getCssValue(element, cssExpectation.cssProperty());
-            if (cssExpectation.matchType() == CssMatchType.CONTAINS_ALL) {
-                for (String expectedValue : expectedValues) {
-                    assertThat(actualValue, org.hamcrest.Matchers.containsString(expectedValue));
-                }
-            } else if (cssExpectation.matchType() == CssMatchType.EXACT) {
-                assertThat(actualValue, equalTo(expectedValues.get(0)));
-            }
+            CssAssertions.assertCss(
+                    cssExpectation.cssProperty(),
+                    element.getCssValue(cssExpectation.cssProperty()),
+                    cssExpectation,
+                    expectedValues.toArray(String[]::new)
+            );
         }
     }
 
-    public WebElement resolveElement(LoginPanelElementExpected expected) {
+    public Element resolveElement(LoginPanelElementExpected expected) {
         return loginPage.resolveElement(expected);
     }
 

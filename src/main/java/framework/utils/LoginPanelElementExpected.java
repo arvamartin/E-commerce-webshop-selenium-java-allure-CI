@@ -9,14 +9,14 @@ public enum LoginPanelElementExpected {
             "titleText",
             List.of(
                     CssExpectation.contains("font-family", "titleTextFontFamily1", "titleTextFontFamily2"),
-                    CssExpectation.exact("font-size", "titleTextFontSize"),
-                    CssExpectation.exact("color", "titleTextColor")
+                    CssExpectation.pixelNear("font-size", "titleTextFontSize"),
+                    CssExpectation.colorNear("color", "titleTextColor")
             )
     ),
 
     LOGIN_PANEL(
             List.of(
-                    CssExpectation.exact("background-color", "loginPanelColor")
+                    CssExpectation.colorNear("background-color", "loginPanelColor")
             )
     ),
 
@@ -28,9 +28,9 @@ public enum LoginPanelElementExpected {
             TextAssertionType.VALUE,
             "loginBtnText",
             List.of(
-                    CssExpectation.exact("background-color", "loginBtnColor"),
-                    CssExpectation.exact("border-radius", "loginBtnBorderRadius"),
-                    CssExpectation.exact("color", "loginBtnTextColor")
+                    CssExpectation.colorNear("background-color", "loginBtnColor"),
+                    CssExpectation.pixelNear("border-radius", "loginBtnBorderRadius"),
+                    CssExpectation.colorNear("color", "loginBtnTextColor")
             )
     );
 

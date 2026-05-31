@@ -6,6 +6,9 @@ public enum Constants {
     LOGIN_URL("https://www.saucedemo.com/"),
     HOME_PAGE_URL("https://www.saucedemo.com/inventory.html"),
     CART_PAGE_URL("https://www.saucedemo.com/cart.html"),
+    CHECKOUT_STEP_ONE_URL("https://www.saucedemo.com/checkout-step-one.html"),
+    CHECKOUT_STEP_TWO_URL("https://www.saucedemo.com/checkout-step-two.html"),
+    CHECKOUT_COMPLETE_URL("https://www.saucedemo.com/checkout-complete.html"),
     INVENTORY_ITEM_PAGE_URL("https://www.saucedemo.com/inventory-item.html?id="),
     ABOUT_PAGE_URL("https://saucelabs.com/"),
 

@@ -52,32 +52,20 @@ public class LoginPage extends BasePage {
     }
 
     public String getLoginPageContainerCssValue(String cssProperty) {
-        return loginPageContainer.getCssValue(cssProperty);
+        return element(loginPageContainer).getCssValue(cssProperty);
     }
 
-    public WebElement resolveElement(LoginPanelElementExpected expected) {
+    public Element resolveElement(LoginPanelElementExpected expected) {
         return switch (expected) {
-            case TITLE -> titleElement;
-            case LOGIN_PANEL -> loginPanel;
-            case USERNAME_INPUT -> userNameInput;
-            case PASSWORD_INPUT -> passwordInput;
-            case LOGIN_BUTTON -> loginBtn;
+            case TITLE -> element(titleElement);
+            case LOGIN_PANEL -> element(loginPanel);
+            case USERNAME_INPUT -> element(userNameInput);
+            case PASSWORD_INPUT -> element(passwordInput);
+            case LOGIN_BUTTON -> element(loginBtn);
         };
     }
 
-    public void waitForVisible(WebElement element) {
-        new Element(element).waitForVisible();
-    }
-
-    public String getText(WebElement element) {
-        return element.getText();
-    }
-
-    public String getAttribute(WebElement element, String attribute) {
-        return element.getAttribute(attribute);
-    }
-
-    public String getCssValue(WebElement element, String cssProperty) {
-        return element.getCssValue(cssProperty);
+    private Element element(WebElement webElement) {
+        return new Element(webElement);
     }
 }

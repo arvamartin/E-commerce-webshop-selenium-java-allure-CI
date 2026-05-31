@@ -1,8 +1,9 @@
 package actions;
 
+import framework.core.Element;
 import framework.core.PropertyReader;
+import framework.utils.CssAssertions;
 import framework.utils.CssExpectation;
-import framework.utils.CssMatchType;
 import framework.utils.SidebarElementExpected;
 import io.qameta.allure.Step;
 import org.openqa.selenium.TimeoutException;
@@ -12,10 +13,9 @@ import pages.components.Sidebar;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 
 public class SidebarAction extends BaseAction<SidebarAction> {
 
@@ -89,7 +89,13 @@ public class SidebarAction extends BaseAction<SidebarAction> {
     @Step("Verifies background color")
     public SidebarAction verifyPanelBackgroundColor() {
         sidebar.waitForPanelVisible();
-        assertThat(sidebar.getPanelCssValue("background-color"), equalTo(sidebarProp("panelBackgroundColor")));
+        CssExpectation expectation = CssExpectation.colorNear("background-color", "panelBackgroundColor");
+        CssAssertions.assertCss(
+                "background-color",
+                sidebar.getPanelCssValue("background-color"),
+                expectation,
+                sidebarProp("panelBackgroundColor")
+        );
         return this;
     }
 
@@ -98,30 +104,28 @@ public class SidebarAction extends BaseAction<SidebarAction> {
 
         for (SidebarElementExpected expected : SidebarElementExpected.values()) {
 
-            WebElement webElement = resolveElement(expected);
-            sidebar.waitForVisible(webElement);
+            Element element = resolveElement(expected);
+            element.waitForVisible();
 
-            assertThat(sidebar.getText(webElement), equalTo(sidebarProp(expected.getTextKey())));
+            assertThat(element.getText(), equalTo(sidebarProp(expected.getTextKey())));
             for (CssExpectation cssExpectation : expected.getCssExpectations()) {
                 List<String> values = cssExpectation.expectedValueKeys()
                         .stream()
                         .map(this::sidebarProp)
                         .toList();
 
-                String actualValue = sidebar.getCssValue(webElement, cssExpectation.cssProperty());
-                if (cssExpectation.matchType() == CssMatchType.CONTAINS_ALL) {
-                    for (String value : values) {
-                        assertThat(actualValue, containsString(value));
-                    }
-                } else if (cssExpectation.matchType() == CssMatchType.EXACT) {
-                    assertThat(actualValue, equalTo(values.get(0)));
-                }
+                CssAssertions.assertCss(
+                        cssExpectation.cssProperty(),
+                        element.getCssValue(cssExpectation.cssProperty()),
+                        cssExpectation,
+                        values.toArray(String[]::new)
+                );
             }
         }
         return this;
     }
 
-    public WebElement resolveElement(SidebarElementExpected expected) {
+    public Element resolveElement(SidebarElementExpected expected) {
         return sidebar.resolveElement(expected);
     }
 

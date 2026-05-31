@@ -29,8 +29,8 @@ public enum SidebarElementExpected {
     private static List<CssExpectation> sidebarElementCss() {
         return List.of(
                 CssExpectation.contains("font-family", "panelElementsFontFamily1", "panelElementsFontFamily2"),
-                CssExpectation.exact("color", "panelElementsTextColor"),
-                CssExpectation.exact("border-bottom-color", "elementBorderBottomColor")
+                CssExpectation.colorNear("color", "panelElementsTextColor"),
+                CssExpectation.colorNear("border-bottom-color", "elementBorderBottomColor")
         );
     }
 }

@@ -12,10 +12,12 @@ The automated tests cover the following areas:
 - Access control validation
 - Product cart functionality (add/remove products)
 - Cart state persistence during navigation
+- Full checkout/order lifecycle validation
 - Sidebar navigation and logout
 - UI verification of selected components
 - Parameterized tests using external test data
 - Test reporting with Allure
+- CI execution profile with class-level parallelization and controlled flaky retry
 
 
 ## Built with
@@ -42,6 +44,11 @@ mvn -version
 ## Running the Tests
 ```bash
 mvn clean test
+```
+
+### CI-style execution
+```bash
+mvn clean test -Pci -Dbrowser=chrome -Dheadless=true
 ```
 
 ### Generate and open Allure report
